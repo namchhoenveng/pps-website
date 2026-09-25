@@ -13,7 +13,7 @@ Copiez à la racine du serveur web :
 
 Aucune base de données, aucun build côté serveur. Le seul composant dynamique
 est `contact.php` (traitement du formulaire), qui tourne sur le PHP déjà présent
-sur l'hébergement OVH. Les dossiers `_src/` et `tools/` sont des sources de
+sur l'hébergement OVH. Les dossiers `_src-v3/` et `tools/` sont des sources de
 travail — **ne les déployez pas**.
 
 ## Structure
@@ -24,24 +24,24 @@ offres.html                           Offres & services (5 offres, ancres #progi
 cas-clients.html                      Références filtrables
 a-propos.html                         Société, méthodologie, modèle de delivery
 blog.html                             Index de la veille IT
-article-ia-copilote-developpeur.html  Article — sert de gabarit
+article-assistants-de-code.html       Article — sert de gabarit
 contact.html                          Coordonnées, carte, formulaire
 mentions-legales.html                 Légal + confidentialité + cookies
 plan-du-site.html                     Plan du site
 
 assets/css/style.css                  Feuille de style unique (design system complet)
-assets/js/main.js                     Comportements (nav, thème, filtre, compteurs, formulaire)
+assets/js/main.js                     Comportements (nav, filtre, formulaire)
 assets/img/                           Logos clients, photos, marque
 
-_src/layout.html                      Gabarit commun : en-tête, pied de page, <head>
-_src/pages/*.html                     Contenu de chaque page
-tools/build.py                        Assemble _src/ → HTML à la racine
+_src-v3/layout.html                   Gabarit commun : en-tête, pied de page, <head>
+_src-v3/pages/*.html                  Contenu de chaque page
+tools/build.py                        Assemble _src-v3/ → HTML à la racine
 tools/check.py                        Vérifie liens, ancres, assets, accessibilité
 ```
 
 ## Modifier le site
 
-**Contenu d'une page** → éditez `_src/pages/<page>.html`, puis :
+**Contenu d'une page** → éditez `_src-v3/pages/<page>.html`, puis :
 
 ```bash
 python tools/build.py
@@ -49,7 +49,7 @@ python tools/check.py
 ```
 
 **En-tête, pied de page, navigation, balises `<head>`** → éditez
-`_src/layout.html` une seule fois, puis rebuild. C'est tout l'intérêt du
+`_src-v3/layout.html` une seule fois, puis rebuild. C'est tout l'intérêt du
 générateur : la navigation n'existe qu'en un seul endroit.
 
 Pour ajouter une entrée au menu, éditez aussi `NAV_ITEMS` dans
@@ -97,9 +97,8 @@ Comportement vérifié en local (PHP 8.3, serveur intégré) :
 construite, **dans le navigateur** :
 
 ```bash
-python tools/audit-contrast.py                        # v1, thème clair
-python tools/audit-contrast.py --root v2 --theme dark
-python tools/audit-contrast.py --root v3 --theme light
+python tools/audit-contrast.py
+python tools/audit-contrast.py --theme dark
 ```
 
 Pourquoi le navigateur et pas la feuille de style : le fond réel d'un texte est
@@ -115,21 +114,19 @@ ces éléments sont listés à part comme « à vérifier au pixel » plutôt qu
 Les dégradés du projet ont été vérifiés par calcul sur chacune de leurs bornes —
 le pire cas pour du blanc opaque est **4,68:1** (l'extrémité rouge), qui passe.
 
-État actuel : **0 échec** sur les six combinaisons version × thème
-(v1 936 éléments, v2 929, v3 900).
+État actuel : **0 échec** sur les deux thèmes, 963 éléments mesurés par thème.
 
 ### Ce que l'audit a trouvé
 
-| Version | Cause | Avant | Après |
-| --- | --- | --- | --- |
-| v1 | `--text-faint` sur `--bg-alt` — 36 occurrences (étiquettes de chiffres, `dt`, `.hint`, `.faint`) | 3,78:1 | **4,77:1** |
-| v3 | `--ink-3` sur `--paper-2` — 16 occurrences (`.facts dt`) | 4,45:1 | **4,73:1** |
-| v3 | `.brand__tag` blanc à 80 % sur le dégradé | 3,46:1 | **4,68:1** |
-| v3 | `.nav__link` à `opacity: .82` sur le dégradé | 3,57:1 | **4,68:1** |
-| v3 | `.ribbon dt` et `.ribbon dd small` blanc à 82 % | 3,57:1 | **4,68:1** |
-| v3 | `.cta p` blanc à 90 % | 4,04:1 | **4,68:1** |
-| v3 | `.tile--grad p` blanc à 92 % | 4,16:1 | **4,68:1** |
-| v3 | bordure `.icon-btn` à 55 % (WCAG 1.4.11, 3:1) | 2,30:1 | **3,46:1** |
+| Cause | Avant | Après |
+| --- | --- | --- |
+| `--ink-3` sur `--paper-2` — 16 occurrences (`.facts dt`) | 4,45:1 | **4,73:1** |
+| `.brand__tag` blanc à 80 % sur le dégradé | 3,46:1 | **4,68:1** |
+| `.nav__link` à `opacity: .82` sur le dégradé | 3,57:1 | **4,68:1** |
+| `.ribbon dt` et `.ribbon dd small` blanc à 82 % | 3,57:1 | **4,68:1** |
+| `.cta p` blanc à 90 % | 4,04:1 | **4,68:1** |
+| `.tile--grad p` blanc à 92 % | 4,16:1 | **4,68:1** |
+| bordure `.icon-btn` à 55 % (WCAG 1.4.11, 3:1) | 2,30:1 | **3,46:1** |
 
 Deux enseignements :
 
@@ -149,8 +146,8 @@ Deux enseignements :
 le fond qui se trouve derrière elles — ce que l'audit de texte ne voit pas.
 
 ```bash
-python tools/audit-hover.py                        # v1, thème clair
-python tools/audit-hover.py --root v3 --theme dark
+python tools/audit-hover.py
+python tools/audit-hover.py --theme dark
 ```
 
 C'est ainsi qu'un survol rouge sur un dégradé rouge→indigo a pu obtenir
@@ -168,13 +165,11 @@ cachait le défaut.
 
 ### Ce que l'audit a corrigé
 
-| Version | Surface | Avant | Après |
-| --- | --- | --- | --- |
-| v3 | `.btn--on-dark:hover` — remplissage rouge sur le dégradé du bloc d'appel | **1,00:1** | **3,91:1** (libellé 13,74:1) |
-| v1 | `.btn--ghost` — la bordure *est* le bouton | 1,38:1 | **4,77:1** |
-| v2 | `.btn--ghost` — idem | 1,55:1 | **4,94:1** |
-| v2 | `.icon-btn` (confort) | 1,22:1 | 1,67:1 |
-| v1 | `.theme-toggle`, `.social a` (confort) | 1,13:1 | 1,49:1 |
+| Surface | Avant | Après |
+| --- | --- | --- |
+| `.btn--on-dark:hover` — remplissage rouge sur le dégradé du bloc d'appel | **1,00:1** | **3,91:1** (libellé 13,74:1) |
+| `.tile--dark` sur `band--dark` — le même jeton que le bandeau, sur 7 tuiles | **1,00:1** | **1,63:1** (contour) + lavis de marque |
+| `.tile--tint` — remplissage pâle sans arête, 4 tuiles | 1,10:1 | arête dégradée 4 px + filet 1 px |
 
 Sur le survol du bloc d'appel, aucun remplissage sombre ne fonctionnait non
 plus : l'indigo profond n'atteint que **1,82:1** contre l'extrémité indigo du
@@ -194,14 +189,12 @@ bouton blanc ressemble à un champ invalide. Le survol retenu fait simplement
 varier la surface — signal conventionnel d'un bouton — sans introduire de
 couleur absente de la palette, et multiplie par trois le contraste du libellé.
 
-Vérification finale : plus aucun survol n'introduit de rouge dans les trois
-versions.
+Vérification finale : plus aucun survol n'introduit de rouge.
 
 ### Ce qui reste signalé, et pourquoi ce n'est pas un échec
 
-Huit éléments restent listés (4 en v1, 2 en v2, 2 en v3) : `.tile--tint`,
-`.pill-link`, `.pillnav a`, `.theme-toggle`, `.social a`, `.icon-btn`. Tous
-portent **leur propre libellé visible ou leur propre glyphe**, et ce libellé ou
+Un élément reste listé : les pastilles d'ancrage du hero de `offres.html`
+(`.pillnav a`, 1,42:1). Il porte **leur propre libellé visible ou leur propre glyphe**, et ce libellé ou
 ce glyphe respecte les seuils de contraste. Le critère 1.4.11 porte sur
 « l'information visuelle nécessaire à l'identification » du composant : quand
 c'est le texte qui identifie le contrôle, sa bordure est décorative. Leurs
@@ -216,7 +209,7 @@ décorés, pas des composants d'interface.
 1. **Mentions légales — deux décisions.** La page a été pré-remplie depuis
    l'annuaire des entreprises de l'État (SIREN 452925118) et le DNS, **pas**
    depuis un document officiel. Un commentaire dans
-   `_src/pages/mentions-legales.html` détaille chaque source. Deux points
+   `_src-v3/pages/mentions-legales.html` détaille chaque source. Deux points
    demandent votre arbitrage :
 
    - L'annuaire donne la dénomination sociale **« PARIS PARTNERS »** (nom
@@ -294,38 +287,20 @@ décorés, pas des composants d'interface.
    hero, comme sur la maquette. La méthodologie détaillée en six étapes reste
    sur la page À propos, vers laquelle le bloc renvoie.
 
-## Trois versions en parallèle
+## Une seule version
 
-Le dépôt contient **trois designs complets et déployables** du même site, avec la
-même architecture d'information (six entrées de menu) et les mêmes faits. Seuls
-le langage visuel et la rédaction changent.
-
-| | v1 | v2 | v3 |
-| --- | --- | --- | --- |
-| Emplacement | racine | `v2/` | `v3/` |
-| Sources | `_src/` | `_src-v2/` | `_src-v3/` |
-| Registre | brochure B2B contemporaine | document d'ingénierie | marque affirmée, inspiré d'Inetum |
-| Couleur | dégradé rouge → indigo, fonds sombres | neutre froid + rouge du logo | dégradé rouge → violet → indigo saturé, indigo profond |
-| Formes | cartes, rayon 20 px, ombres | filets 1 px, rayon 3 px | tuiles à angles vifs, aucun rayon |
-| Typographie | Space Grotesk + Inter | Inter Tight + Inter + JetBrains Mono | Archivo + Manrope, titres en capitales |
-| Contenu | grilles de cartes | listes et tableaux | mosaïque de tuiles inégales |
-| Imagerie | une photo de La Défense | aucune | six planches SVG générées |
-| Thème sombre | oui, avec bascule | oui, avec bascule | non — parti pris de marque |
-| Animation | apparition au défilement, compteurs | aucune | dérive lente du hero |
-| JavaScript | 380 lignes | 242 lignes | 190 lignes |
-
-Construction, avec le même outillage :
+Le dépôt a porté trois designs complets en parallèle (v1 à la racine, v2 et
+v3 dans leurs sous-dossiers). v3 a été retenu : c'est désormais le seul, et il
+occupe la racine. v1 et v2 restent récupérables dans l'historique git, au
+commit `4e11caf` :
 
 ```bash
-python tools/build.py                                    # v1 -> racine
-python tools/check.py
-
-python tools/build.py --src _src-v2 --out v2 --noindex   # v2 -> v2/
-python tools/check.py --root v2
-
-python tools/build.py --src _src-v3 --out v3 --noindex   # v3 -> v3/
-python tools/check.py --root v3
+git checkout 4e11caf -- v2 _src-v2     # récupérer v2
+git show 4e11caf:index.html            # consulter un fichier de v1
 ```
+
+Les sections qui suivent gardent le préfixe « v3 » : c'est le nom du parti
+pris visuel, pas celui d'un dossier.
 
 ### v3 — imagerie générée
 
@@ -436,11 +411,6 @@ tuiles à planche et les libellés translucides.
 À noter : un auditeur automatique ne voit ici que `transparent`. Les contrastes
 ci-dessus ont donc été calculés borne par borne, pas mesurés sur le rendu.
 
-**v1 et v2 ne changent pas.** v1 n'a plus que trois rouges plats, tous des états
-d'erreur. v2 en a neuf, mais huit sont des index de 11 px en monospace — trop
-petits pour un dégradé — et le neuvième est son emphase de titre : or v2 est
-délibérément sans aucun dégradé. Lui en ajouter un contredirait sa prémisse.
-
 ### v3 — sens du dégradé : conservé, et harmonisé
 
 Question posée : faut-il inverser le dégradé de la barre de navigation ?
@@ -546,66 +516,8 @@ débordant des bords, motif de petits carrés, et le motif de lien
 - Inetum affiche du magenta sur jaune à 3,61:1. Chaque paire de v3 a été mesurée.
 - Inetum n'a pas de balise `description` et son `<title>` est « French | Inetum ».
 
-`v3/` est construit avec `--noindex`, comme `v2/`.
-
-Les trois versions partagent `contact.php` et les mêmes logos clients.
-
-### Palette v2 — corrigée
-
-Le premier jet utilisait un greyscale **chaud** (teinte 45°) et un accent
-`#c8341e`. Résultat : un rendu sépia façon papeterie, et un accent décalé de
-6° vers l'orange par rapport au rouge du logo (`#dc2f2a`, teinte 1,7°).
-
-Corrigé :
-
-| Rôle | Clair | Sombre | Note |
-| --- | --- | --- | --- |
-| Papier | `#f9f9fb` | `#0a0a0c` | neutre, très légèrement froid |
-| Encre | `#101014` | `#ececef` | 18:1 / 17:1 |
-| Encre secondaire | `#52525b` | `#a1a1aa` | 7,4:1 / 7,7:1 |
-| Encre tertiaire | `#6c6c76` | `#8b8b95` | 4,9:1 / 5,9:1 — passe AA |
-| Accent (texte) | `#d12a25` | `#f4483f` | teinte du logo, assombrie/éclaircie pour atteindre AA |
-| Rouge de marque | `#dc2f2a` | `#f4483f` | `--brand-red`, réservé au logo (graphique, pas du texte) |
-
-Le rouge du logo tel quel ne donne que 4,45:1 sur le papier clair : insuffisant
-pour du petit texte. `--accent` est donc la **même teinte** assombrie jusqu'à
-4,9:1, tandis que `--brand-red` garde la valeur exacte de la marque pour le
-symbole.
-
-Enfin, l'indicateur de focus utilise l'encre et non l'accent : le rouge sert
-déjà à signaler les erreurs de formulaire, et un anneau rouge autour d'un
-bouton actif se lit comme une erreur.
-
-`v2/` est construit avec `--noindex` : les pages portent
-`<meta name="robots" content="noindex, nofollow">` pour qu'un aperçu mis en
-ligne ne concurrence pas le site réel dans les moteurs de recherche. À retirer
-si v2 devient la version publiée.
-
-Les deux versions partagent `contact.php` (copié dans `v2/`) et les mêmes
-logos clients. Si v2 est retenue, les images n'ont plus besoin d'être
-dupliquées.
-
-## Barre secteurs (accueil)
-
-Sous le hero, une bande de pastilles « Nous intervenons pour » renvoie vers la
-section Secteurs de la page Cas clients. Chaque pastille pointe vers une ancre
-précise, pas vers le haut de la section :
-
-| Pastille | Ancre |
-| --- | --- |
-| Banque & assurance | `cas-clients.html#secteur-banque` |
-| Éditeurs de logiciels | `cas-clients.html#secteur-editeurs` |
-| Archivage documentaire | `cas-clients.html#secteur-archivage` |
-| Industrie & automobile | `cas-clients.html#secteur-industrie` |
-| Services & annuaires | `cas-clients.html#secteur-services` |
-| Secteur médical | `cas-clients.html#secteur-medical` |
-
-Les `id` correspondants sont portés par les cartes de
-`_src/pages/cas-clients.html`. `check.py` vérifie que les six ancres résolvent :
-si vous renommez une carte, le contrôle échoue.
-
-La bande s'enroule sur plusieurs lignes plutôt que de défiler horizontalement —
-avec six entrées, rien ne justifie de cacher du contenu derrière un swipe.
+Les builds de prévisualisation s'obtiennent avec `--out _preview --noindex` ;
+le build du site, lui, est indexable.
 
 ## Ce qui a changé par rapport à l'ancien site
 

@@ -1,180 +1,121 @@
 /* ==========================================================================
-   Paris Partners Softwares — design system
-   Static site, no build step. Single stylesheet, organised top to bottom:
-   tokens → reset → primitives → layout → components → utilities → motion.
+   Paris Partners Softwares — v3, "brand-led mosaic"
+   ---------------------------------------------------------------------------
+   Design language borrowed from inetum.com, palette taken from PPS.
+
+   What is adopted from Inetum:
+     - a saturated gradient top bar with uppercase navigation
+     - full-bleed hero imagery
+     - a mosaic of unequal tiles mixing solid brand colours with imagery
+     - an uppercase category label above every tile title
+     - offset solid blocks bleeding off the left and right edges
+     - the small-square motif, and the "EN SAVOIR PLUS ->" link pattern
+
+   What is deliberately NOT adopted:
+     - Inetum puts its <h1> BELOW a full-height blurred image, so the fold
+       communicates nothing. Here the proposition sits on the hero.
+     - Inetum ships four <h1> elements and zero <section>. This uses one <h1>
+       per page and real landmarks.
+     - Inetum sets magenta on yellow at 3.61:1. Every pair here was measured.
+
+   Colour mapping: Inetum's magenta -> PPS red #dc2f2a; its navy -> PPS deep
+   indigo #141a4a; its electric yellow has no PPS equivalent, so the structural
+   role it plays (bright offset blocks) is taken by a pale indigo tint. There is
+   no invented third hue.
+
+   Single fixed look, no theme toggle: v3 is brand-led, and a brand this
+   saturated does not have a quiet mode.
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. Tokens
-   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------- 1. tokens */
 
 :root {
-  /* Brand constants — identical in every theme. Derived from the PPS mark
-     (red triangle / indigo triangle) so the palette stays on-brand. */
+  color-scheme: light;
+
+  --f-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Brand.
+     Three separate roles, because one saturated red cannot carry all of them:
+       --accent  working colour: buttons, labels, links, card edges. Indigo,
+                 9.03:1 on white, and it reads as stability rather than alarm —
+                 which matters when the product being sold is reliability.
+       --emph    headline emphasis and the one red tile. The brand red, used
+                 sparingly so it still lands.
+       --danger  errors only. Never used as decoration, so a red field border
+                 means exactly one thing. */
   --red: #dc2f2a;
-  --red-strong: #b9231e;
-  --red-soft: #fdecea;
+  --emph: #dc2f2a;
+  --danger: #c0231e;
+  --purple: #8e2f8c;
   --indigo: #2f3f9e;
-  --indigo-strong: #232f78;
-  --indigo-soft: #eceef9;
-  --brand-gradient: linear-gradient(118deg, #dc2f2a 0%, #8e2f8c 52%, #2f3f9e 100%);
-  --brand-gradient-soft: linear-gradient(118deg, rgba(220, 47, 42, .14) 0%, rgba(142, 47, 140, .12) 52%, rgba(47, 63, 158, .14) 100%);
+  --accent: #2f3f9e;
+  --accent-dark: #141a4a;
+  --ground: #141a4a;
+  --ground-2: #0e1338;
+  --grad: linear-gradient(104deg, #dc2f2a 0%, #8e2f8c 52%, #2f3f9e 100%);
+  /* The same sweep at 55%, for tiles that carry body text: over --ground it
+     lands between #84293b and #26317a, dark enough to keep --on-dark-2 at
+     4.54:1 while giving each tile an actual hue instead of flat navy. */
+  --grad-wash: linear-gradient(104deg, rgba(220, 47, 42, .55) 0%, rgba(142, 47, 140, .55) 52%, rgba(47, 63, 158, .55) 100%);
+  --grad-soft: linear-gradient(104deg, rgba(220, 47, 42, .92), rgba(47, 63, 158, .92));
+  /* For gradient text on the deep-indigo grounds. The brand gradient cannot be
+     used there: its purple end measures 2.30:1 and its indigo end 1.82:1
+     against #141a4a. These lifted stops all clear 7:1. */
+  --grad-light: linear-gradient(104deg, #ff8a80 0%, #e29ada 52%, #9daaf3 100%);
+  /* The working accent, lifted for the deep-indigo grounds. --accent itself
+     (#2f3f9e) measures 1.82:1 on #141a4a and is unusable there. Same value as
+     the indigo stop of --grad-light above, so this names a colour rather than
+     introducing one. 7.43:1 on the darkest band. */
+  --accent-light: #9daaf3;
 
-  /* Typography */
-  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* Surfaces */
+  --paper: #ffffff;
+  --paper-2: #f4f5fb;
+  --tint: #e7eaf9;
+  --ink: #10132a;
+  --ink-2: #474d69;
+  --ink-3: #666c8a;   /* 4.73:1 sur --paper-2, le pire fond où il apparaît */
+  --rule: #dfe2ef;
+  --on-dark: #ffffff;
+  --on-dark-2: #c3c9e6;
 
-  /* Fluid type scale */
-  --fs-xs: .8125rem;
-  --fs-sm: .9375rem;
-  --fs-base: clamp(1rem, .975rem + .12vw, 1.0625rem);
-  --fs-lg: clamp(1.09rem, 1.04rem + .25vw, 1.25rem);
-  --fs-xl: clamp(1.3rem, 1.2rem + .48vw, 1.6rem);
-  --fs-2xl: clamp(1.65rem, 1.42rem + 1.05vw, 2.3rem);
-  --fs-3xl: clamp(2rem, 1.55rem + 2vw, 3.1rem);
-  --fs-4xl: clamp(2.35rem, 1.5rem + 3.5vw, 4.15rem);
+  /* Type scale */
+  --t-mi: .6875rem;
+  --t-xs: .8125rem;
+  --t-sm: .9375rem;
+  --t-base: clamp(1rem, .98rem + .1vw, 1.0625rem);
+  --t-md: clamp(1.0625rem, 1.02rem + .2vw, 1.1875rem);
+  --t-lg: clamp(1.2rem, 1.12rem + .35vw, 1.45rem);
+  --t-xl: clamp(1.45rem, 1.3rem + .7vw, 2rem);
+  --t-2xl: clamp(1.8rem, 1.45rem + 1.6vw, 2.85rem);
+  --t-3xl: clamp(2.2rem, 1.6rem + 2.9vw, 4rem);
 
-  --lh-tight: 1.08;
-  --lh-snug: 1.25;
-  --lh-body: 1.68;
-
-  /* Spacing — 4px base */
   --sp-1: .25rem;
   --sp-2: .5rem;
   --sp-3: .75rem;
   --sp-4: 1rem;
   --sp-5: 1.5rem;
   --sp-6: 2rem;
-  --sp-7: 2.5rem;
-  --sp-8: 3rem;
-  --sp-9: 4rem;
-  --sp-10: 5rem;
-  --sp-11: 6.5rem;
-  --sp-12: 8rem;
+  --sp-7: 2.75rem;
+  --sp-8: 3.5rem;
+  --sp-9: 5rem;
 
-  --section-y: clamp(3.5rem, 2rem + 6vw, 7rem);
-  --container: 1180px;
-  --container-pad: clamp(1.15rem, .6rem + 2.4vw, 2.5rem);
-
-  /* Radii */
-  --r-sm: .5rem;
-  --r: .875rem;
-  --r-lg: 1.25rem;
-  --r-xl: 1.75rem;
-  --r-full: 999px;
-
-  --header-h: 4.5rem;
-
-  --ease: cubic-bezier(.22, .61, .36, 1);
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --gutter: clamp(1.15rem, .5rem + 3vw, 3.5rem);
+  --maxw: 1380px;
+  --r: 0px;            /* Inetum's tiles are hard-cornered. So are these. */
+  --head-h: 4.25rem;
+  --ease: cubic-bezier(.32, .72, .35, 1);
 }
 
-/* Light theme (default) */
-:root,
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #ffffff;
-  --bg-alt: #f5f6fb;
-  --surface: #ffffff;
-  --surface-2: #f9fafd;
-  --surface-inset: #f2f4fa;
-  --border: #e3e7f1;
-  --border-strong: #cdd4e4;
-  --text: #10132a;
-  --text-muted: #4e5570;
-  --text-faint: #666d83;   /* 4.77:1 sur --bg-alt, le pire fond clair */
-  --accent: var(--indigo);
-  --accent-hover: var(--indigo-strong);
-  --accent-on: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(16, 19, 42, .06), 0 1px 3px rgba(16, 19, 42, .04);
-  --shadow: 0 4px 6px -2px rgba(16, 19, 42, .05), 0 12px 24px -6px rgba(16, 19, 42, .1);
-  --shadow-lg: 0 8px 12px -4px rgba(16, 19, 42, .06), 0 28px 56px -12px rgba(16, 19, 42, .16);
-  --logo-tile: #ffffff;
-  --logo-blend: normal;
-}
+/* ---------------------------------------------------------- 2. reset & base */
 
-/* Dark theme */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #0a0e1c;
-  --bg-alt: #0e1326;
-  --surface: #121830;
-  --surface-2: #161d38;
-  --surface-inset: #1a2242;
-  --border: #232c4c;
-  --border-strong: #33406b;
-  --text: #e8ebf7;
-  --text-muted: #a4acc8;
-  --text-faint: #7b84a3;
-  --accent: #8b9bf0;
-  --accent-hover: #a6b2f5;
-  --accent-on: #0a0e1c;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
-  --shadow: 0 4px 8px rgba(0, 0, 0, .35), 0 16px 32px -8px rgba(0, 0, 0, .5);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, .4), 0 40px 72px -16px rgba(0, 0, 0, .6);
-  --logo-tile: #eef1f8;
-  --logo-blend: normal;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-    --bg: #0a0e1c;
-    --bg-alt: #0e1326;
-    --surface: #121830;
-    --surface-2: #161d38;
-    --surface-inset: #1a2242;
-    --border: #232c4c;
-    --border-strong: #33406b;
-    --text: #e8ebf7;
-    --text-muted: #a4acc8;
-    --text-faint: #7b84a3;
-    --accent: #8b9bf0;
-    --accent-hover: #a6b2f5;
-    --accent-on: #0a0e1c;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
-    --shadow: 0 4px 8px rgba(0, 0, 0, .35), 0 16px 32px -8px rgba(0, 0, 0, .5);
-    --shadow-lg: 0 12px 24px rgba(0, 0, 0, .4), 0 40px 72px -16px rgba(0, 0, 0, .6);
-    --logo-tile: #eef1f8;
-  }
-}
-
-/* Always-dark panels (hero, CTA, footer). Rebinding the tokens locally means
-   every component inside works unchanged in either theme. */
-.panel-dark {
-  color-scheme: dark;
-  --bg: #0a0e1c;
-  --bg-alt: #0e1326;
-  --surface: rgba(255, 255, 255, .05);
-  --surface-2: rgba(255, 255, 255, .07);
-  --surface-inset: rgba(255, 255, 255, .04);
-  --border: rgba(255, 255, 255, .12);
-  --border-strong: rgba(255, 255, 255, .22);
-  --text: #f2f4fc;
-  --text-muted: #b3bbd6;
-  --text-faint: #8a93b2;
-  --accent: #9daaf3;
-  --accent-hover: #b8c1f7;
-  --accent-on: #0a0e1c;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* --------------------------------------------------------------------------
-   2. Reset & base
-   -------------------------------------------------------------------------- */
-
-*,
-*::before,
-*::after { box-sizing: border-box; }
-
+*, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + 1.5rem);
-  tab-size: 4;
+  scroll-padding-top: calc(var(--head-h) + 1.5rem);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -182,417 +123,356 @@ html {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: var(--fs-base);
-  line-height: var(--lh-body);
-  font-synthesis-weight: none;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--t-base);
+  line-height: 1.66;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-body.nav-open { overflow: hidden; }
+body.is-locked { overflow: hidden; }
 
-img,
-svg,
-video {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
+img, svg { display: block; max-width: 100%; height: auto; }
 
-h1, h2, h3, h4, h5 {
-  font-family: var(--font-display);
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
   font-weight: 700;
-  line-height: var(--lh-snug);
-  letter-spacing: -.018em;
+  line-height: 1.08;
+  letter-spacing: -.015em;
   text-wrap: balance;
-  color: var(--text);
 }
 
-h1 { font-size: var(--fs-4xl); line-height: var(--lh-tight); letter-spacing: -.03em; }
-h2 { font-size: var(--fs-3xl); letter-spacing: -.025em; }
-h3 { font-size: var(--fs-xl); }
-h4 { font-size: var(--fs-lg); }
+h1 { font-size: var(--t-3xl); }
+h2 { font-size: var(--t-2xl); }
+h3 { font-size: var(--t-lg); line-height: 1.2; }
+h4 { font-size: var(--t-md); }
 
 p { text-wrap: pretty; }
-
-a {
-  color: var(--accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: .18em;
-  transition: color .18s var(--ease);
-}
-
-a:hover { color: var(--accent-hover); }
+a { color: inherit; }
 
 ul, ol { padding-left: 1.15rem; }
+li + li { margin-top: .35em; }
 
-li + li { margin-top: .3em; }
+strong { font-weight: 700; }
 
-strong { font-weight: 650; color: var(--text); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: .18em; cursor: help; }
 
-abbr[title] {
-  text-decoration: underline dotted;
-  text-underline-offset: .2em;
-  cursor: help;
-}
-
-blockquote {
-  margin: 0;
-  padding-left: var(--sp-4);
-  border-left: 2px solid var(--border-strong);
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-hr {
-  height: 1px;
-  border: 0;
-  background: var(--border);
-  margin-block: var(--sp-6);
-}
-
-:where(button, input, select, textarea) {
-  font: inherit;
-  color: inherit;
-}
-
+:where(button, input, select, textarea) { font: inherit; color: inherit; }
 button { cursor: pointer; }
 
-::selection {
-  background: rgba(47, 63, 158, .18);
-  color: inherit;
-}
+::selection { background: var(--accent); color: #fff; }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: var(--r-sm);
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 
 :focus:not(:focus-visible) { outline: none; }
 
-/* --------------------------------------------------------------------------
-   3. Layout primitives
-   -------------------------------------------------------------------------- */
+/* ------------------------------------------------------------ 3. primitives */
 
-.container {
+.shell {
   width: 100%;
-  max-width: var(--container);
+  max-width: var(--maxw);
   margin-inline: auto;
-  padding-inline: var(--container-pad);
+  padding-inline: var(--gutter);
 }
 
-.container--narrow { max-width: 780px; }
-.container--wide { max-width: 1320px; }
-
-.section { padding-block: var(--section-y); }
-.section--tight { padding-block: calc(var(--section-y) * .62); }
-.section--alt { background: var(--bg-alt); }
-
-.section-head {
-  max-width: 46rem;
-  margin-bottom: var(--sp-8);
+.band {
+  position: relative;
+  padding-block: clamp(3rem, 2rem + 5vw, 5.75rem);
+  overflow: hidden;
 }
 
-.section-head--center {
-  margin-inline: auto;
-  text-align: center;
+.band--tight { padding-block: clamp(2rem, 1.5rem + 3vw, 3.5rem); }
+.band--paper2 { background: var(--paper-2); }
+.band--tint { background: var(--tint); }
+.band--dark { background: var(--ground); color: var(--on-dark); }
+.band--dark h1, .band--dark h2, .band--dark h3, .band--dark h4 { color: var(--on-dark); }
+
+/* ...but not inside a light tile. .tile--tint keeps its pale fill on any band,
+   so the blanket rule above put white on #e7eaf9 at 1.20:1. The band says what
+   the BAND's ground is, not what every surface inside it is. */
+.band--dark .tile--tint :is(h1, h2, h3, h4) { color: var(--ink); }
+.band--dark .tile--tint { color: var(--ink); }
+
+/* Inetum's signature device — solid blocks bleeding off the band edges — was
+   tried here and removed. It works there because the blocks are large and
+   overlap content, so they read as a layer in a composition. Absolutely
+   positioned in a section's margin, with nothing behind or over them, they
+   read as stray rectangles instead. Both the red and the pale variants were
+   reported as looking like bugs, which is the correct reading.
+
+   The square motif (.squares) is kept: it only ever sits on the hero plate or
+   the CTA gradient, so it has a real ground and reads as a motif rather than
+   as a floating shape. That difference is the whole lesson.
+
+   Half true, as it turned out. On the hero plate the brand cells read; on the
+   CTA the ground IS the brand gradient, so brand-coloured cells measured
+   1.02:1 and the motif was simply not there. See .cta .squares below. */
+
+.band > .shell { position: relative; z-index: 1; }
+
+/* The square motif — a 2x2 reading of the PPS mark.
+
+   The mark is two triangles split on the anti-diagonal: red over the upper-left
+   half (M3 3 h34 L3 37 Z) and indigo over the lower-right (M41 7 v34 h-34).
+   With the mark on a unit square that is red where x+y < 1 and indigo where
+   x+y > 1: the top-left cell spans 0..1 so it is wholly red, the bottom-right
+   spans 1..2 so it is wholly indigo, and the other two span 0.5..1.5 — the
+   split line runs corner to corner across each of them. So rather than
+   approximating with the blend hue, they carry the edge itself: the triangle
+   above-left of the line red, the one below-right indigo. The gradient runs
+   perpendicular to that line, top-left to bottom-right, hence 135deg.
+
+   Previously six cells in an arbitrary red / indigo / tint / purple / gap / red
+   arrangement, which read as decoration with no source. */
+.squares {
+  position: absolute;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1.75rem);
+  gap: .35rem;
+  pointer-events: none;
 }
 
-.section-head > p {
-  margin-top: var(--sp-4);
-  font-size: var(--fs-lg);
-  color: var(--text-muted);
+.squares span { aspect-ratio: 1; }
+.squares span:nth-child(1) { background: var(--red); }     /* haut gauche  */
+/* The half-pixel feather keeps the diagonal edge from stepping. */
+.squares span:nth-child(2),
+.squares span:nth-child(3) {
+  background: linear-gradient(135deg,
+    var(--red) 0 calc(50% - .5px), var(--indigo) calc(50% + .5px) 100%);
 }
+.squares span:nth-child(4) { background: var(--indigo); }  /* bas droite   */
 
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: .55rem;
-  margin-bottom: var(--sp-4);
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: .13em;
+  display: block;
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent);
 }
 
-.eyebrow::before {
-  content: "";
-  width: 1.6rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--brand-gradient);
+.eyebrow--on-dark { color: var(--accent-light); }
+
+/* --accent on --ground is 1.82:1. That was left to the author remembering
+   .eyebrow--on-dark, and the first section moved to a dark band forgot it.
+   Inside a band it is no longer a choice. The modifier stays for .hero, .phero
+   and .cta, which are not .band. */
+.band--dark .eyebrow { color: var(--accent-light); }
+
+.deck {
+  max-width: 62ch;
+  font-size: var(--t-md);
+  color: var(--ink-2);
 }
 
-.section-head--center .eyebrow::before { display: none; }
+.band--dark .deck { color: var(--on-dark-2); }
 
-/* Auto-fitting grid, driven by --min per instance */
-.grid {
-  display: grid;
-  gap: var(--sp-5);
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--min, 17rem), 100%), 1fr));
-}
+.note { font-size: var(--t-sm); color: var(--ink-3); }
+.measure { max-width: 64ch; }
+.center { text-align: center; }
 
-.grid--2 { --min: 24rem; }
-.grid--3 { --min: 18rem; }
-.grid--4 { --min: 13rem; }
-.grid--gap-lg { gap: var(--sp-6); }
-
-.split {
-  display: grid;
-  gap: clamp(2rem, 1rem + 4vw, 4.5rem);
-  align-items: center;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 62rem) {
-  .split { grid-template-columns: 1fr 1fr; }
-  .split--sticky { align-items: start; grid-template-columns: minmax(0, 22rem) 1fr; }
-  .split--sticky > :first-child { position: sticky; top: calc(var(--header-h) + 2rem); }
-}
-
-/* Top-aligned variant, for when the two columns differ a lot in height. */
-.split--top { align-items: start; }
-
-.stack > * + * { margin-top: var(--sp-4); }
-.stack-lg > * + * { margin-top: var(--sp-6); }
-
-.lead {
-  font-size: var(--fs-lg);
-  color: var(--text-muted);
-}
-
-.prose { max-width: 68ch; }
-.prose > * + * { margin-top: var(--sp-4); }
-.prose h2 { margin-top: var(--sp-8); font-size: var(--fs-2xl); }
-.prose h3 { margin-top: var(--sp-6); }
-.prose ul { color: var(--text-muted); }
-
-/* --------------------------------------------------------------------------
-   4. Buttons
-   -------------------------------------------------------------------------- */
-
-.btn {
-  --btn-bg: var(--accent);
-  --btn-fg: var(--accent-on);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .55rem;
-  padding: .8rem 1.5rem;
-  border: 1px solid transparent;
-  border-radius: var(--r-full);
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  letter-spacing: -.005em;
-  line-height: 1.2;
-  text-decoration: none;
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
-  transition: transform .2s var(--ease), box-shadow .2s var(--ease),
-              background-color .2s var(--ease), border-color .2s var(--ease),
-              color .2s var(--ease);
+  border: 0;
 }
-
-.btn:hover {
-  color: var(--btn-fg);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-
-.btn:active { transform: translateY(0); }
-
-.btn svg { width: 1.05em; height: 1.05em; flex: none; }
-
-.btn--primary {
-  background: var(--brand-gradient);
-  background-size: 160% 100%;
-  background-position: 0% 50%;
-  color: #fff;
-  transition: transform .2s var(--ease), box-shadow .2s var(--ease),
-              background-position .45s var(--ease);
-}
-
-.btn--primary:hover {
-  color: #fff;
-  background-position: 100% 50%;
-  box-shadow: 0 10px 28px -8px rgba(142, 47, 140, .55);
-}
-
-/* A ghost button has no fill, so its border is the only thing identifying it
-   as a control — SC 1.4.11 applies to it directly. --border-strong gave
-   1.38:1; --text-faint gives 4.77:1 on the worst light ground and far more in
-   dark. */
-.btn--ghost {
-  background: transparent;
-  border-color: var(--text-faint);
-  color: var(--text);
-}
-
-.btn--ghost:hover {
-  color: var(--text);
-  border-color: var(--text-faint);
-  background: var(--surface-2);
-}
-
-.btn--lg { padding: .95rem 1.85rem; font-size: var(--fs-base); }
-.btn--sm { padding: .6rem 1.15rem; font-size: var(--fs-xs); }
-.btn--block { width: 100%; }
-
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  align-items: center;
-}
-
-/* Text link with a sliding arrow */
-.link-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.link-arrow svg {
-  width: 1em;
-  height: 1em;
-  transition: transform .25s var(--ease);
-}
-
-.link-arrow:hover svg { transform: translateX(4px); }
-
-/* --------------------------------------------------------------------------
-   5. Header & navigation
-   -------------------------------------------------------------------------- */
 
 .skip-link {
   position: fixed;
-  top: .75rem;
-  left: 50%;
-  z-index: 200;
-  padding: .7rem 1.25rem;
-  border-radius: var(--r-full);
-  background: var(--indigo);
+  top: .5rem; left: 50%;
+  z-index: 300;
+  padding: .65rem 1.2rem;
+  background: var(--ink);
   color: #fff;
-  font-size: var(--fs-sm);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: var(--t-sm);
   text-decoration: none;
   transform: translate(-50%, -220%);
-  transition: transform .22s var(--ease);
+  transition: transform .2s var(--ease);
 }
 
-.skip-link:focus-visible {
+.skip-link:focus-visible { transform: translate(-50%, 0); }
+
+/* Section heading: uppercase, centred, with a short gradient rule beneath —
+   Inetum centres its section titles in magenta caps. */
+.shead {
+  max-width: 52rem;
+  margin-inline: auto;
+  margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  text-align: center;
+}
+
+.shead h2 {
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+}
+
+.shead h2 .em { color: var(--emph); }
+.band--dark .shead h2 .em { color: #ff8a80; }
+
+.shead::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 4px;
+  margin: var(--sp-5) auto 0;
+  background: var(--grad);
+}
+
+.shead .deck { margin-top: var(--sp-5); margin-inline: auto; }
+.shead .eyebrow { margin-bottom: var(--sp-3); }
+
+.shead--left { margin-inline: 0; text-align: left; }
+.shead--left::after { margin-inline: 0; }
+.shead--left .deck { margin-inline: 0; }
+
+/* -------------------------------------------------------------- 4. controls */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .85rem 1.6rem;
+  border: 2px solid transparent;
+  border-radius: var(--r);
+  background: var(--accent);
   color: #fff;
-  transform: translate(-50%, 0);
+  font-family: var(--f-display);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .18s var(--ease), color .18s var(--ease),
+              border-color .18s var(--ease);
 }
 
-.site-header {
+.btn:hover { background: var(--accent-dark); color: #fff; }
+
+.btn--ghost { background: transparent; border-color: var(--ink); color: var(--ink); }
+.btn--ghost:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.btn--on-dark { background: #fff; color: var(--ground); }
+/* Was: fill turns red on hover. On the CTA band that is a red button on a
+   red-to-indigo gradient — 1.00:1 at the red end, so the button's boundary
+   vanished, and the label dropped from 16.45:1 to 4.68:1. Hovering made the
+   control *less* visible.
+   No dark fill works either: deep indigo only reaches 1.82:1 against the
+   gradient's indigo end. This band tolerates light fills only. So the surface
+   stays white (4.68:1 boundary at worst) and hover is signalled by the label
+   plus an inset ring. */
+.btn--on-dark:hover {
+  /* The surface shifts to the pale brand blue — the conventional button-hover
+     signal. Earlier attempts and why they were dropped:
+       - red fill:  1.00:1 against the red end of the CTA gradient;
+       - dark fill: 1.82:1 against its indigo end, so no dark works either;
+       - red label + red ring: passed at 4.68:1 but read as a validation error
+         on a white field.
+     This keeps a light surface (3.91:1 boundary, above the 3:1 required),
+     raises the label to 13.74:1, and introduces no colour that is not already
+     in the palette. */
+  background: var(--tint);
+  color: var(--ground);
+}
+
+.btn--ghost-dark { background: transparent; border-color: #fff; color: #fff; }
+.btn--ghost-dark:hover { background: #fff; color: var(--ground); }
+
+.btn svg { width: 1.05em; height: 1.05em; flex: none; }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+
+/* The "EN SAVOIR PLUS ->" pattern */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: var(--f-display);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.more svg { width: 1.4em; height: 1.4em; flex: none; transition: transform .22s var(--ease); }
+.more:hover svg { transform: translateX(5px); }
+.more--light { color: #fff; }
+.more--ink { color: var(--ink); }
+
+/* ---------------------------------------------------------------- 5. topbar */
+
+.topbar {
   position: sticky;
   top: 0;
-  z-index: 100;
-  border-bottom: 1px solid transparent;
-  transition: background-color .25s var(--ease), border-color .25s var(--ease),
-              backdrop-filter .25s var(--ease), box-shadow .25s var(--ease);
+  z-index: 200;
+  background: var(--grad);
+  color: #fff;
 }
 
-.site-header::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--brand-gradient);
-  opacity: 0;
-  transition: opacity .3s var(--ease);
-}
-
-.site-header.is-stuck {
-  /* Opaque fallback first, for engines without color-mix(). */
-  background: var(--bg);
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  backdrop-filter: saturate(160%) blur(14px);
-  border-bottom-color: var(--border);
-  box-shadow: var(--shadow-sm);
-}
-
-.site-header.is-stuck::after { opacity: .9; }
-
-.site-header__inner {
+.topbar__inner {
   display: flex;
   align-items: center;
   gap: var(--sp-5);
-  min-height: var(--header-h);
+  min-height: var(--head-h);
 }
 
-/* Brand lockup — SVG mark + HTML wordmark, so it stays crisp and themeable */
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: .7rem;
+  gap: .6rem;
   margin-right: auto;
-  color: var(--text);
+  color: #fff;
   text-decoration: none;
   flex: none;
 }
 
-.brand__mark {
-  width: 2.3rem;
-  height: 2.3rem;
-  flex: none;
-  transition: transform .35s var(--ease-out);
-}
-
-.brand:hover .brand__mark { transform: rotate(-8deg) scale(1.05); }
-
-.brand__text { display: grid; }
+.brand__mark { width: 2rem; height: 2rem; flex: none; }
 
 .brand__name {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-family: var(--f-display);
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: .01em;
-  line-height: 1;
+  letter-spacing: -.01em;
 }
 
 .brand__tag {
   font-size: .625rem;
-  font-weight: 500;
-  letter-spacing: .085em;
+  font-weight: 600;
+  letter-spacing: .13em;
   text-transform: uppercase;
-  line-height: 1.4;
-  color: var(--text-faint);
+  color: #fff;   /* rgba(.8) donnait 3,46:1 sur le rouge du dégradé */
+  display: block;
+  line-height: 1.3;
 }
 
-/* Flex rather than display:contents — keeps the nav landmark and list
-   semantics intact for screen readers. */
-.nav {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
+@media (max-width: 44rem) { .brand__tag { display: none; } }
 
-/* The in-drawer CTA duplicates the one in .header__actions; each theme shows
-   exactly one of the two. */
+.nav { display: flex; align-items: center; gap: var(--sp-5); }
+
+/* The in-drawer CTA duplicates the one in .bar-tools; each viewport shows
+   exactly one. (Third time writing this rule across the three versions — it is
+   the standard trap of putting the same button in two places.) */
 .nav > .btn { display: none; }
 
 .nav__list {
   display: flex;
   align-items: center;
-  gap: .1rem;
-  margin: 0;
-  padding: 0;
+  gap: var(--sp-5);
+  margin: 0; padding: 0;
   list-style: none;
 }
 
@@ -601,194 +481,135 @@ button { cursor: pointer; }
 .nav__link {
   position: relative;
   display: block;
-  padding: .55rem .8rem;
-  border-radius: var(--r-sm);
-  color: var(--text-muted);
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 550;
+  padding: .4rem 0;
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: .11em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: color .18s var(--ease), background-color .18s var(--ease);
+  white-space: nowrap;
+  /* Was opacity .82 = 3,57:1 on the red end of the bar. Opaque at rest; hover
+     is signalled by an underline rather than by opacity. */
+  opacity: 1;
+  border-bottom: 2px solid transparent;
+  transition: border-color .18s var(--ease);
 }
 
-.nav__link:hover {
-  color: var(--text);
-  background: var(--surface-2);
-}
-
-.nav__link[aria-current="page"] { color: var(--text); }
+.nav__link:hover { border-bottom-color: rgba(255, 255, 255, .8); }
+.nav__link[aria-current="page"] { opacity: 1; }
 
 .nav__link[aria-current="page"]::after {
   content: "";
   position: absolute;
-  left: .8rem;
-  right: .8rem;
-  bottom: .2rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--brand-gradient);
+  left: 0; right: 0; bottom: -.1rem;
+  height: 3px;
+  background: #fff;
 }
 
-.header__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  flex: none;
-}
+.bar-tools { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
 
-/* Theme toggle — sun and moon swap via [data-theme] on <html> */
-.theme-toggle {
+.icon-btn {
   display: grid;
   place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  /* Icon-only: the sun/moon glyph carries identification, so a 3:1 boundary is
-     not required. --border-strong over --border simply makes it findable. */
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-full);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  transition: color .18s var(--ease), border-color .18s var(--ease),
-              background-color .18s var(--ease);
+  width: 2.4rem; height: 2.4rem;
+  /* .55 donnait 2,30:1 ; WCAG 1.4.11 demande 3:1 sur une bordure d'interface */
+  border: 2px solid rgba(255, 255, 255, .8);
+  background: transparent;
+  color: #fff;
+  transition: background-color .18s var(--ease), border-color .18s var(--ease);
 }
 
-.theme-toggle:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
+.icon-btn:hover { background: rgba(255, 255, 255, .16); border-color: #fff; }
+.icon-btn svg { width: 1.1rem; height: 1.1rem; }
 
-.theme-toggle svg { width: 1.05rem; height: 1.05rem; }
-.theme-toggle .icon-moon { display: none; }
+.nav-toggle { display: none; }
 
-:root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
-:root[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .theme-toggle .icon-sun { display: none; }
-  :root:not([data-theme]) .theme-toggle .icon-moon { display: block; }
-}
-
-/* Hamburger */
-.nav-toggle {
-  display: none;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  color: var(--text);
-}
-
-.nav-toggle__bars {
-  position: relative;
-  width: 1.1rem;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
-  transition: background-color .2s var(--ease);
-}
-
-.nav-toggle__bars::before,
-.nav-toggle__bars::after {
+.nav-toggle .bars { position: relative; width: 1.1rem; height: 2px; background: currentColor; }
+.nav-toggle .bars::before,
+.nav-toggle .bars::after {
   content: "";
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  border-radius: 2px;
+  position: absolute; left: 0;
+  width: 100%; height: 2px;
   background: currentColor;
-  transition: transform .28s var(--ease);
+  transition: transform .22s var(--ease);
 }
+.nav-toggle .bars::before { top: -6px; }
+.nav-toggle .bars::after { top: 6px; }
+.nav-toggle[aria-expanded="true"] .bars { background: transparent; }
+.nav-toggle[aria-expanded="true"] .bars::before { transform: translateY(6px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .bars::after { transform: translateY(-6px) rotate(-45deg); }
 
-.nav-toggle__bars::before { top: -6px; }
-.nav-toggle__bars::after { top: 6px; }
-
-.nav-toggle[aria-expanded="true"] .nav-toggle__bars { background: transparent; }
-.nav-toggle[aria-expanded="true"] .nav-toggle__bars::before { transform: translateY(6px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nav-toggle__bars::after { transform: translateY(-6px) rotate(-45deg); }
-
-@media (max-width: 60rem) {
+@media (max-width: 66rem) {
   .nav-toggle { display: grid; }
 
   .nav {
-    display: block;
     position: fixed;
-    inset: var(--header-h) 0 0;
-    z-index: 99;
-    padding: var(--sp-6) var(--container-pad) var(--sp-9);
-    background: var(--bg);
-    border-top: 1px solid var(--border);
+    inset: var(--head-h) 0 0;
+    z-index: 199;
+    display: block;
+    padding: var(--sp-6) var(--gutter) var(--sp-9);
+    background: var(--ground);
     overflow-y: auto;
-    opacity: 0;
     visibility: hidden;
-    transform: translateY(-.6rem);
-    transition: opacity .26s var(--ease), transform .26s var(--ease), visibility .26s;
+    opacity: 0;
+    transition: opacity .22s var(--ease), visibility .22s;
   }
 
-  .nav.is-open {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-  }
+  .nav.is-open { visibility: visible; opacity: 1; }
 
-  .nav__list {
-    flex-direction: column;
-    align-items: stretch;
-    gap: .25rem;
-  }
+  .nav__list { flex-direction: column; align-items: stretch; gap: 0; }
 
   .nav__link {
-    padding: .85rem .25rem;
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
-    font-size: var(--fs-lg);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .16);
+    font-size: var(--t-sm);
   }
 
-  .nav__link[aria-current="page"]::after { left: .25rem; right: auto; width: 1.75rem; bottom: .35rem; }
-
+  .nav__link[aria-current="page"]::after { left: 0; right: auto; width: 2rem; bottom: -1px; }
   .nav > .btn {
     display: inline-flex;
-    margin-top: var(--sp-5);
+    margin-top: var(--sp-6);
+    width: 100%;
+    justify-content: center;
   }
-
-  .header__actions .btn--primary { display: none; }
+  .nav__link { white-space: normal; }
+  .bar-tools .btn { display: none; }
 }
 
-/* --------------------------------------------------------------------------
-   6. Hero
-   -------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------ 6. hero */
 
 .hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-block: clamp(3.5rem, 2rem + 8vw, 7.5rem);
+  background: var(--ground);
+  color: #fff;
+  padding-block: clamp(3.5rem, 2rem + 7vw, 7.5rem);
 }
 
-/* Layered backdrop: photo → gradient mesh → grid lines */
-.hero__media {
+.hero__plate {
   position: absolute;
   inset: 0;
-  z-index: -3;
-  object-fit: cover;
+  z-index: -2;
   width: 100%;
   height: 100%;
-  opacity: .2;
-  filter: grayscale(.5) contrast(1.1);
+  object-fit: cover;
 }
 
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: -20% -10% auto auto;
-  z-index: -2;
-  width: min(46rem, 80vw);
-  aspect-ratio: 1;
-  background: radial-gradient(circle at 60% 40%, rgba(220, 47, 42, .34), transparent 62%),
-              radial-gradient(circle at 30% 70%, rgba(47, 63, 158, .4), transparent 65%);
-  filter: blur(28px);
-  pointer-events: none;
+/* Substitutes for Inetum's hero video: a slow drift of the generated plate.
+   Disabled entirely under prefers-reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__plate {
+    animation: drift 46s ease-in-out infinite alternate;
+    transform-origin: 60% 40%;
+  }
+}
+
+@keyframes drift {
+  from { transform: scale(1.04) translate3d(0, 0, 0); }
+  to   { transform: scale(1.12) translate3d(-1.5%, -1.5%, 0); }
 }
 
 .hero::after {
@@ -796,1133 +617,860 @@ button { cursor: pointer; }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background:
-    linear-gradient(to right, rgba(10, 14, 28, .96) 0%, rgba(10, 14, 28, .82) 46%, rgba(10, 14, 28, .5) 100%),
-    linear-gradient(to top, var(--bg) 2%, transparent 40%);
-  pointer-events: none;
+  background: linear-gradient(96deg, rgba(14, 19, 56, .93) 0%, rgba(14, 19, 56, .74) 48%, rgba(14, 19, 56, .36) 100%);
 }
 
-.hero__inner {
+.hero__inner { max-width: 46rem; }
+.hero h1 { text-transform: uppercase; }
+.hero h1 .em { color: #ff8a80; }
+
+.hero__deck {
+  margin-top: var(--sp-6);
+  max-width: 54ch;
+  font-size: var(--t-lg);
+  line-height: 1.5;
+  color: var(--on-dark-2);
+}
+
+.hero .actions { margin-top: var(--sp-7); }
+
+.hero .squares { right: 8%; bottom: 12%; }
+
+@media (max-width: 60rem) { .hero .squares { display: none; } }
+
+/* Stat ribbon riding the bottom edge of the hero */
+.ribbon {
   position: relative;
-  max-width: 45rem;
-}
-
-.hero h1 .accent {
-  position: relative;
-  background: linear-gradient(100deg, #ff7a6b, #c78ff0 55%, #8fa3ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.hero__lead {
-  margin-top: var(--sp-5);
-  max-width: 38rem;
-  font-size: var(--fs-lg);
-  color: var(--text-muted);
-}
-
-.hero .btn-row { margin-top: var(--sp-7); }
-
-.hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-6);
-  margin-top: var(--sp-8);
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--border);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-.hero__meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-}
-
-.hero__meta svg { width: 1rem; height: 1rem; color: var(--accent); flex: none; }
-
-/* Compact hero for inner pages */
-.page-hero {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  padding-block: clamp(2.75rem, 1.5rem + 5vw, 5rem);
-  border-bottom: 1px solid var(--border);
-}
-
-.page-hero::before {
-  content: "";
-  position: absolute;
-  inset: -60% -20% auto 30%;
-  z-index: -1;
-  width: min(40rem, 70vw);
-  aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(220, 47, 42, .22), transparent 60%),
-              radial-gradient(circle at 70% 60%, rgba(47, 63, 158, .28), transparent 62%);
-  filter: blur(30px);
-  pointer-events: none;
-}
-
-.page-hero h1 { max-width: 34rem; }
-
-.page-hero .lead {
-  margin-top: var(--sp-4);
-  max-width: 42rem;
-}
-
-/* --------------------------------------------------------------------------
-   6b. Sector bar — a thin qualifying strip under the hero.
-   Borrowed from Radio France's topic-pill row, but wrapping rather than
-   horizontally scrolling: with only six entries nothing needs to be hidden
-   behind a swipe.
-   -------------------------------------------------------------------------- */
-
-.sector-bar {
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-  padding-block: var(--sp-5);
-}
-
-.sector-bar__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-3) var(--sp-5);
-}
-
-.sector-bar__label {
-  flex: none;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.pill-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pill-row li { margin-top: 0; }
-
-/* Deliberately larger and more tappable than .tag, which is metadata. This is
-   navigation, so it gets a real hit area. */
-.pill-link {
-  display: inline-flex;
-  align-items: center;
-  padding: .5rem 1.05rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-full);
-  background: var(--surface);
-  color: var(--text-muted);
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 550;
-  line-height: 1.3;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color .18s var(--ease), border-color .18s var(--ease),
-              background-color .18s var(--ease), transform .18s var(--ease);
-}
-
-.pill-link:hover,
-.pill-link:focus-visible {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-  transform: translateY(-1px);
-}
-
-/* --------------------------------------------------------------------------
-   7. Cards
-   -------------------------------------------------------------------------- */
-
-.card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: var(--sp-6);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease),
-              border-color .3s var(--ease);
-}
-
-.card--hover:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-lg);
-}
-
-.card h3 { margin-bottom: var(--sp-3); }
-
-.card p { color: var(--text-muted); }
-
-.card > * + * { margin-top: var(--sp-3); }
-
-.card ul {
-  padding-left: 0;
-  list-style: none;
-  color: var(--text-muted);
-  font-size: var(--fs-sm);
-}
-
-.card ul li {
-  position: relative;
-  padding-left: 1.35rem;
-}
-
-.card ul li::before {
-  content: "";
-  position: absolute;
-  left: .1rem;
-  top: .62em;
-  width: .42rem;
-  height: .42rem;
-  border-radius: 50%;
-  background: var(--brand-gradient);
-}
-
-.card__foot { margin-top: auto; padding-top: var(--sp-4); }
-
-/* Icon tile */
-.icon-tile {
-  display: grid;
-  place-items: center;
-  width: 3rem;
-  height: 3rem;
-  margin-bottom: var(--sp-5);
-  border-radius: var(--r);
-  background: var(--brand-gradient);
+  z-index: 2;
+  background: var(--grad);
   color: #fff;
-  box-shadow: 0 6px 18px -6px rgba(142, 47, 140, .5);
 }
 
-.icon-tile svg { width: 1.4rem; height: 1.4rem; }
-
-.icon-tile--ghost {
-  background: var(--surface-inset);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  box-shadow: none;
+.ribbon__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
 
-/* Numbered card, used for the offer grid */
-.card--numbered::before {
-  content: attr(data-num);
-  position: absolute;
-  top: var(--sp-5);
-  right: var(--sp-6);
-  font-family: var(--font-display);
-  font-size: 2.6rem;
+.ribbon__grid > div {
+  padding: var(--sp-5) var(--sp-4);
+  border-left: 1px solid rgba(255, 255, 255, .25);
+}
+
+.ribbon__grid > div:first-child { border-left: 0; padding-left: 0; }
+
+.ribbon dt {
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #fff;   /* rgba(.82) donnait 3,57:1 sur le rouge du dégradé */
+}
+
+.ribbon dd {
+  margin: .4rem 0 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2.2rem);
   font-weight: 700;
   line-height: 1;
-  color: var(--text);
-  opacity: .07;
 }
 
-/* --------------------------------------------------------------------------
-   8. Stats
-   -------------------------------------------------------------------------- */
-
-.stats {
-  display: grid;
-  gap: 1px;
-  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--border);
-  overflow: hidden;
-}
-
-.stat {
-  padding: var(--sp-6) var(--sp-5);
-  background: var(--surface);
-  text-align: center;
-}
-
-.stat__value {
-  font-family: var(--font-display);
-  font-size: clamp(2.1rem, 1.6rem + 2vw, 3rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -.03em;
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat__label {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-/* --------------------------------------------------------------------------
-   9. Client logo wall
-   -------------------------------------------------------------------------- */
-
-/* Flex, not grid. The logo count is odd (13), so the final row holds a single
-   tile — grid's justify-content centres the tracks but still pins that tile to
-   the first column. Flex wrapping centres each row independently, including a
-   partial one. */
-.logo-wall {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: var(--sp-4);
-}
-
-.logo-wall__item {
-  /* Fixed basis keeps every tile the same width across rows. */
-  flex: 0 0 9.25rem;
-  display: grid;
-  place-items: center;
-  padding: var(--sp-4);
-  min-height: 5.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  /* Client logos are supplied on opaque white, so keep a light tile in both
-     themes rather than trying to knock the background out. */
-  background: var(--logo-tile);
-  transition: border-color .25s var(--ease), transform .25s var(--ease);
-}
-
-.logo-wall__item:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
-}
-
-/* Client logo files carry a lot of built-in whitespace, so the visible mark is
-   well under the box height. Sized generously to compensate. */
-.logo-wall__item img {
-  width: 100%;
-  max-height: 3.75rem;
-  object-fit: contain;
-  filter: grayscale(1);
-  opacity: .78;
-  transition: filter .25s var(--ease), opacity .25s var(--ease);
-}
-
-.logo-wall__item:hover img {
-  filter: none;
-  opacity: 1;
-}
-
-/* Logos sourced direct from the client's own site are tight-cropped, while the
-   legacy 300×150 files carry a lot of built-in whitespace. Insetting the tight
-   ones keeps every mark at a comparable optical size across the wall. */
-.logo-wall__item--tight img {
-  width: auto;
-  max-width: 74%;
-  max-height: 2.35rem;
-}
-
-/* Very wide wordmarks (10:1 and beyond) need the width, not the height. */
-.logo-wall__item--wide img {
-  width: auto;
-  max-width: 88%;
-  max-height: 1.5rem;
-}
-
-/* Two per row on phones, rather than a single narrow column. */
-@media (max-width: 40rem) {
-  .logo-wall__item { flex: 0 0 calc(50% - var(--sp-4) / 2); }
-}
-
-/* --------------------------------------------------------------------------
-   10. Process / methodology
-   -------------------------------------------------------------------------- */
-
-.steps {
-  display: grid;
-  gap: var(--sp-5);
-  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
-  counter-reset: step;
-}
-
-.step {
-  position: relative;
-  padding-top: var(--sp-6);
-  border-top: 2px solid var(--border);
-  counter-increment: step;
-}
-
-.step::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: 0;
-  width: 2.5rem;
-  height: 2px;
-  background: var(--brand-gradient);
-}
-
-.step__num {
+.ribbon dd small {
   display: block;
-  margin-bottom: var(--sp-2);
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .1em;
-  color: var(--text-faint);
-}
-
-.step__num::before { content: "0" counter(step); }
-
-.step h3 { font-size: var(--fs-base); text-transform: uppercase; letter-spacing: .04em; }
-
-.step p {
-  margin-top: var(--sp-2);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-/* --------------------------------------------------------------------------
-   Engagement arc — the four beats of a client relationship, left to right.
-   Chevrons only appear in the full four-across layout, so a wrapped grid never
-   shows an arrow pointing at nothing.
-   -------------------------------------------------------------------------- */
-
-.flow {
-  display: grid;
-  gap: var(--sp-7) var(--sp-7);
-  grid-template-columns: 1fr;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: flow;
-}
-
-.flow__step {
-  position: relative;
-  margin-top: 0;
-  counter-increment: flow;
-}
-
-.flow__step::after {
-  content: "";
-  display: none;
-  position: absolute;
-  top: 1.5rem;
-  right: calc(var(--sp-7) / -2 - .25rem);
-  width: .5rem;
-  height: .5rem;
-  border-top: 2px solid var(--red);
-  border-right: 2px solid var(--red);
-  transform: rotate(45deg);
-}
-
-.flow__icon {
-  display: grid;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-bottom: var(--sp-5);
-  border-radius: 50%;
-  background: var(--brand-gradient);
-  color: #fff;
-  box-shadow: 0 8px 20px -8px rgba(142, 47, 140, .5);
-}
-
-.flow__icon svg { width: 1.6rem; height: 1.6rem; }
-
-.flow__num {
-  display: block;
-  margin-bottom: var(--sp-2);
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.flow__num::before { content: "Étape 0" counter(flow); }
-
-.flow__step h3 { font-size: var(--fs-base); }
-
-.flow__step p {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-@media (min-width: 40rem) {
-  .flow { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 66rem) {
-  .flow { grid-template-columns: repeat(4, 1fr); }
-  .flow__step:not(:last-child)::after { display: block; }
-}
-
-/* Vertical timeline, used on À propos */
-.timeline {
-  position: relative;
-  margin: 0;
-  padding: 0 0 0 var(--sp-6);
-  list-style: none;
-  border-left: 1px solid var(--border);
-}
-
-.timeline li {
-  position: relative;
-  margin-top: 0;
-  padding-bottom: var(--sp-6);
-}
-
-.timeline li:last-child { padding-bottom: 0; }
-
-.timeline li::before {
-  content: "";
-  position: absolute;
-  left: calc(-1 * var(--sp-6) - 5px);
-  top: .5em;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--brand-gradient);
-  /* Halo must match whatever surface the timeline sits on, so it reads as a
-     gap in the vertical line rather than a ring. */
-  box-shadow: 0 0 0 4px var(--timeline-halo, var(--bg));
-}
-
-.timeline__year {
-  display: block;
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.timeline h3 { margin-top: .15rem; font-size: var(--fs-base); }
-
-.timeline p { margin-top: var(--sp-2); color: var(--text-muted); font-size: var(--fs-sm); }
-
-/* --------------------------------------------------------------------------
-   10b. Fact list — key/value rows, used where a photograph would otherwise sit
-   -------------------------------------------------------------------------- */
-
-.factlist {
-  margin: 0;
-  display: grid;
-}
-
-.factlist > div {
-  display: grid;
-  grid-template-columns: minmax(0, 9rem) 1fr;
-  gap: var(--sp-4);
-  padding-block: var(--sp-4);
-  border-top: 1px solid var(--border);
-}
-
-.factlist > div:first-of-type {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.factlist > div:last-of-type { padding-bottom: 0; }
-
-.factlist dt {
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.factlist dd {
-  margin: 0;
-  font-size: var(--fs-sm);
-  color: var(--text);
-}
-
-@media (max-width: 32rem) {
-  .factlist > div {
-    grid-template-columns: 1fr;
-    gap: .25rem;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   10c. Delivery model — two linked sites
-   -------------------------------------------------------------------------- */
-
-.delivery {
-  display: grid;
-  gap: var(--sp-4);
-  grid-template-columns: 1fr auto 1fr;
-  align-items: stretch;
-}
-
-.delivery__node {
-  padding: var(--sp-6);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
-
-.delivery__place {
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.delivery__node h3 {
   margin-top: .35rem;
-  font-size: var(--fs-lg);
-}
-
-.delivery__node ul {
-  margin-top: var(--sp-4);
-  padding-left: 0;
-  list-style: none;
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-.delivery__node li {
-  position: relative;
-  padding-left: 1.2rem;
-}
-
-.delivery__node li::before {
-  content: "";
-  position: absolute;
-  left: .1rem;
-  top: .62em;
-  width: .38rem;
-  height: .38rem;
-  border-radius: 50%;
-  background: var(--brand-gradient);
-}
-
-.delivery__link {
-  display: grid;
-  place-items: center;
-  color: var(--text-faint);
-}
-
-.delivery__link svg {
-  width: 1.75rem;
-  height: 1.75rem;
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: #fff;   /* rgba(.82) donnait 3,57:1 sur le rouge du dégradé */
 }
 
 @media (max-width: 52rem) {
-  .delivery { grid-template-columns: 1fr; }
-  .delivery__link svg { transform: rotate(90deg); }
+  .ribbon__grid { grid-template-columns: repeat(2, 1fr); }
+  .ribbon__grid > div:nth-child(2n+1) { border-left: 0; padding-left: 0; }
+  .ribbon__grid > div:nth-child(n+3) { border-top: 1px solid rgba(255, 255, 255, .25); }
 }
 
-/* --------------------------------------------------------------------------
-   11. Case studies + filter
-   -------------------------------------------------------------------------- */
-
-.filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-6);
-  padding: 0;
-  list-style: none;
-}
-
-.filter li { margin-top: 0; }
-
-.filter__btn {
-  padding: .5rem 1.05rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-full);
-  background: var(--surface);
-  color: var(--text-muted);
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 550;
-  transition: color .18s var(--ease), border-color .18s var(--ease),
-              background-color .18s var(--ease);
-}
-
-.filter__btn:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
-
-.filter__btn[aria-pressed="true"] {
-  background: var(--text);
-  border-color: var(--text);
-  color: var(--bg);
-}
-
-.case-grid {
-  display: grid;
-  gap: var(--sp-5);
-  grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
-}
-
-.case {
-  display: flex;
-  flex-direction: column;
+/* Compact hero for inner pages */
+.phero {
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease),
-              border-color .3s var(--ease), opacity .3s var(--ease);
+  background: var(--ground);
+  color: #fff;
+  padding-block: clamp(2.75rem, 2rem + 4vw, 5rem);
 }
 
-.case:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-lg);
+.phero__plate {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .85;
 }
 
-.case[hidden] { display: none; }
+.phero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(96deg, rgba(14, 19, 56, .94), rgba(14, 19, 56, .6));
+}
 
-.case__logo {
+.phero h1 { text-transform: uppercase; max-width: 30ch; }
+.phero .deck { margin-top: var(--sp-5); color: var(--on-dark-2); }
+.phero .eyebrow { color: var(--accent-light); margin-bottom: var(--sp-3); }
+
+/* ---------------------------------------------------------------- 7. mosaic */
+
+/* Unequal tiles mixing solid brand colours with generated imagery. The four
+   variants give the grid its rhythm, exactly as Inetum alternates yellow
+   solids with duotone photographs. */
+.mosaic {
   display: grid;
-  place-items: center;
-  padding: var(--sp-6);
-  min-height: 8rem;
-  background: var(--logo-tile);
-  border-bottom: 1px solid var(--border);
+  gap: var(--sp-4);
+  grid-template-columns: repeat(6, 1fr);
 }
 
-.case__logo img {
-  max-height: 4.75rem;
-  max-width: 100%;
-  width: auto;
-  object-fit: contain;
-}
-
-.case__body {
+.tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  padding: var(--sp-5) var(--sp-6) var(--sp-6);
+  min-height: 15rem;
+  padding: var(--sp-6);
+  grid-column: span 2;
+  text-decoration: none;
+  transition: transform .25s var(--ease);
 }
 
-.case__body h3 { font-size: var(--fs-lg); }
+.tile:hover { transform: translateY(-4px); }
 
-.case__body p {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
+.tile__plate {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.case__foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
-  margin-top: auto;
-  padding-top: var(--sp-5);
+/* Fallback ground. The plate is a child <img> and the scrim is ::after, so
+   without this a failed image request leaves white text on the band colour —
+   invisible. With it, the tile degrades to a solid deep-indigo card. */
+.tile--plate { background: var(--ground); }
+
+.tile--plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(14, 19, 56, .93) 6%, rgba(14, 19, 56, .45) 62%, rgba(14, 19, 56, .2) 100%);
 }
 
-/* Tags & pills */
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
+.tile--plate,
+.tile--dark,
+.tile--grad { color: #fff; }
+
+/* Flat --ground read as plain navy — and identically on every tile. Three
+   layers now: a slight white lift, a window on the washed brand sweep, and the
+   ground beneath as the opaque base. The window steps red / purple / indigo on
+   a 3-cycle, so neighbouring tiles never share a hue whatever the mosaic holds
+   — no dependency on how many tiles there are. */
+.tile--dark {
+  background:
+    linear-gradient(158deg, rgba(255, 255, 255, .09) 0%, rgba(255, 255, 255, .015) 100%),
+    var(--grad-wash),
+    var(--ground);
+  background-size: auto, 300% 100%, auto;
+}
+
+.mosaic > .tile--dark:nth-child(3n + 1) { background-position: 0 0, 0% 0, 0 0; }
+.mosaic > .tile--dark:nth-child(3n + 2) { background-position: 0 0, 50% 0, 0 0; }
+.mosaic > .tile--dark:nth-child(3n + 3) { background-position: 0 0, 100% 0, 0 0; }
+
+/* .tile--dark is --ground, and so is .band--dark: on a dark band the tile
+   measured 1.00:1 against it — not faint, identical — so seven tiles across
+   offres and cas-clients had no edge at all and only their text showed. Same
+   fault as .tile--tint on a white band: the fill is the band's own token.
+   Lifted off it with the white wash the dark step cards already use, plus the
+   1px outline the other dark cards carry.
+
+   .tile--plate is included because its background is only a fallback for a
+   failed image request — on a dark band that fallback was invisible too. */
+.band--dark :is(.tile--dark, .tile--plate) { border: 1px solid rgba(255, 255, 255, .16); }
+
+/* .tile--plate's background is only a fallback for a failed image request, and
+   --ground is invisible on a dark band. It inherits the same wash. */
+.band--dark .tile--plate {
+  background:
+    linear-gradient(158deg, rgba(255, 255, 255, .09) 0%, rgba(255, 255, 255, .015) 100%),
+    var(--grad-wash),
+    var(--ground);
+}
+/* Was a flat brand-red panel: the 11px label measured 3.79:1 on flat red, and
+   a whole red card read as an alert panel once red had been demoted to
+   emphasis-only. Replaced by the brand gradient.
+
+   It was first oriented indigo-first, so the small label would land on the
+   indigo end. That reason disappeared when every text in the tile was made
+   opaque white (>= 4.68:1 on any stop), leaving the tile running the opposite
+   way to the top bar, the ribbon and the CTA band for no reason. Now red-first
+   like all of them — which is also the order of the PPS mark itself: red
+   triangle top-left, indigo triangle bottom-right. The angle stays diagonal
+   because the tile is a card, not a horizontal band. */
+.tile--grad {
+  background: linear-gradient(155deg, var(--emph) 0%, var(--purple) 52%, var(--indigo) 100%);
+}
+/* The pale fill is 1.20:1 on a white band and 1.10:1 on --paper-2, so on its
+   own it draws no edge whatever: the tile dissolves into the band and the
+   mosaic stops reading as a mosaic. No colour in this range fixes that — even
+   --rule only reaches 1.19:1 — so the boundary has to be drawn, not tinted. */
+.tile--tint {
+  background: var(--tint);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+/* Same 4px brand edge as the step cards and the rule under each section title,
+   so the tile is anchored by the design's own device rather than by a grey box
+   outline. */
+.tile--tint::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 4px;
+  background: var(--grad);
+}
+
+.tile__label {
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+/* Content used to be bottom-anchored on every variant, by justify-content:
+   flex-end on .tile plus margin-bottom: auto on the label. That is right on a
+   plate tile, where the space it opens is filled by the artwork — and wrong
+   everywhere else, where it opens nothing and starts each tile's text at a
+   different height according to how long its own paragraph is: in one row the
+   three headings sat at 2080 / 2105 / 2081. Bottom-anchoring is now the plate
+   tile's behaviour only. */
+.tile--plate {
+  justify-content: flex-end;
+}
+
+.tile--plate .tile__label { margin-bottom: auto; }
+
+.tile--plate .tile__label { color: var(--accent-light); }
+/* --accent-light fell to 4.49:1 on the red end of the wash; white is also what
+   .tile--grad already uses on a coloured ground. */
+.tile--dark .tile__label { color: #fff; }
+.tile--grad .tile__label { color: #fff; }
+.tile--tint .tile__label { color: var(--accent); }
+
+.tile h3 { margin-top: var(--sp-5); }
+.tile p { margin-top: var(--sp-3); font-size: var(--t-sm); }
+.tile--plate p, .tile--dark p { color: var(--on-dark-2); }
+.tile--grad p { color: #fff; }   /* rgba(.92) donnait 4,29:1 sur l'extrémité rouge */
+.tile--tint p { color: var(--ink-2); }
+/* With the body at the top, the footing pins to the bottom so a row of tiles
+   lines its links and chips up regardless of paragraph length — the same rule
+   .post__body .more and .ref__stack already use. Not on plate tiles, whose
+   label already claims the free space. */
+.tile .more { margin-top: var(--sp-5); }
+.tile:not(.tile--plate) :is(.more, .chips) { margin-top: auto; padding-top: var(--sp-5); }
+.tile--plate .more, .tile--dark .more, .tile--grad .more { color: #fff; }
+
+/* Spans that produce the uneven rhythm */
+.tile--wide { grid-column: span 4; }
+.tile--tall { grid-row: span 2; min-height: 32rem; }
+.tile--full { grid-column: span 6; }
+
+@media (max-width: 68rem) {
+  .mosaic { grid-template-columns: repeat(4, 1fr); }
+  .tile--wide { grid-column: span 4; }
+  .tile--tall { grid-row: span 1; min-height: 18rem; }
+  .tile--full { grid-column: span 4; }
+}
+
+@media (max-width: 44rem) {
+  .mosaic { grid-template-columns: 1fr; }
+  .tile, .tile--wide, .tile--full { grid-column: span 1; }
+  .tile--tall { min-height: 15rem; }
+}
+
+/* --------------------------------------------------------- 8. duotone photos */
+
+/* Not used yet: PPS has no photography. When real photographs arrive, wrapping
+   one in .duotone applies the same red/indigo treatment the plates carry, so
+   the imagery stays a single visual family. */
+.duotone {
+  position: relative;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+.duotone img {
+  width: 100%;
+  filter: grayscale(1) contrast(1.15);
+  mix-blend-mode: luminosity;
+}
+
+.duotone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--grad-soft);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------- 9. numbered set */
+
+.steps {
+  display: grid;
+  gap: var(--sp-4);
+  /* Six steps is a known, fixed count, so the column count is declared rather
+     than left to auto-fit. auto-fit cannot guarantee a split: at 1268px of
+     content even minmax(19rem) resolved to four columns, leaving 4+2 with two
+     empty cells. Declared, it is always 3+3, then 2+2+2, then 6. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  counter-reset: st;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.tags li { margin-top: 0; }
+.steps > li {
+  position: relative;
+  margin-top: 0;
+  padding: var(--sp-6);
+  /* A shallow diagonal rather than one flat colour. Previously an opaque fill
+     on light bands and a flat rgba(255,255,255,.06) wash on dark ones — six
+     identical dead rectangles in a row. */
+  background: linear-gradient(158deg, var(--paper) 0%, var(--paper-2) 100%);
+  counter-increment: st;
+  transition: transform .2s var(--ease), background .2s var(--ease);
+}
 
-.tag {
+/* The 4px edge carries the brand gradient — the same device as the rule under
+   each section title. Rather than repeating the whole red→indigo sweep six
+   times, each card shows a window onto it, sliding one fifth further along per
+   step: the procedure reads as one continuous run from the first box to the
+   last. Indexed on nth-child rather than on the column, so it stays continuous
+   at 3, 2 and 1 columns alike. */
+.steps > li::before {
+  content: "";
+  position: absolute;
+  /* -1px so the edge bleeds over the 1px card outline and reads flush, the
+     way the plain 4px border-top does on .post and .panel. */
+  inset: -1px -1px auto -1px;
+  height: 4px;
+  background: var(--grad);
+  background-size: 300% 100%;
+}
+
+.steps > li:nth-child(1)::before { background-position: 0% 0; }
+.steps > li:nth-child(2)::before { background-position: 20% 0; }
+.steps > li:nth-child(3)::before { background-position: 40% 0; }
+.steps > li:nth-child(4)::before { background-position: 60% 0; }
+.steps > li:nth-child(5)::before { background-position: 80% 0; }
+.steps > li:nth-child(6)::before { background-position: 100% 0; }
+
+.steps > li:hover { transform: translateY(-3px); }
+
+.band--dark .steps > li {
+  background: linear-gradient(158deg, rgba(255, 255, 255, .11) 0%, rgba(255, 255, 255, .025) 100%);
+}
+
+.band--dark .steps > li:hover {
+  background: linear-gradient(158deg, rgba(255, 255, 255, .155) 0%, rgba(255, 255, 255, .05) 100%);
+}
+
+.steps__n {
+  display: block;
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .16em;
+  color: var(--accent);
+}
+
+.band--dark .steps__n { color: var(--accent-light); }
+.steps__n::before { content: "ÉTAPE 0" counter(st); }
+
+.steps h3 { margin-top: var(--sp-3); font-size: var(--t-md); text-transform: uppercase; }
+.steps p { margin-top: var(--sp-3); font-size: var(--t-sm); color: var(--ink-2); }
+.band--dark .steps p { color: var(--on-dark-2); }
+
+/* Six steps, so the split is declared at every width: 3+3, 2+2+2, then 6. */
+@media (max-width: 62rem) {
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 40rem) {
+  .steps { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------ 10. logo band */
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5) var(--sp-8);
+}
+
+.logos img {
+  width: auto;
+  max-width: 7rem;
+  max-height: 2rem;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: .55;
+  transition: filter .18s var(--ease), opacity .18s var(--ease);
+}
+
+.logos img:hover { filter: none; opacity: 1; }
+
+/* ------------------------------------------------------------ 11. reference */
+
+.refs {
+  display: grid;
+  gap: var(--sp-4);
+  /* Eight references, a known count — declared rather than auto-fit, as for
+     .steps and .tgrid. 4+4, then 2x4, then 8. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 72rem) { .refs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 40rem) { .refs { grid-template-columns: 1fr; } }
+
+/* Head plate then body, the same two-part rhythm as .tcard — but the head here
+   holds a CLIENT logo, not our own title, so it cannot take the brand gradient
+   the way .tcard's does. Nine of the ten logo files are dark artwork (mean
+   luminance .03 to .20): on the sweep they measure 2.07:1 at the indigo end
+   against 18.73:1 on white. The plate stays white for that reason. */
+.ref {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+/* The 4px edge carries a window on the brand sweep, one eighth further along
+   per card, so the eight references run red to indigo like the step cards. */
+.ref::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 4px;
+  background: var(--grad);
+  background-size: 800% 100%;
+}
+
+.ref:nth-child(1)::before { background-position: 0% 0; }
+.ref:nth-child(2)::before { background-position: 14.3% 0; }
+.ref:nth-child(3)::before { background-position: 28.6% 0; }
+.ref:nth-child(4)::before { background-position: 42.9% 0; }
+.ref:nth-child(5)::before { background-position: 57.1% 0; }
+.ref:nth-child(6)::before { background-position: 71.4% 0; }
+.ref:nth-child(7)::before { background-position: 85.7% 0; }
+.ref:nth-child(8)::before { background-position: 100% 0; }
+
+/* Centred in a fixed band with one max-height for every file: the logos are
+   supplied at wildly different scales and left-aligning them at their own size
+   made the row look ragged. Greyscale keeps ten client brands from fighting. */
+.ref__logo {
+  display: grid;
+  place-items: center;
+  height: 6rem;
+  margin: 0;
+  padding: var(--sp-4);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+.ref__logo img {
+  width: auto;
+  max-width: 70%;
+  max-height: 2.4rem;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: .9;
+}
+
+.ref__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--sp-5);
+  background: linear-gradient(158deg, var(--paper-2) 0%, #eef1f9 100%);
+}
+
+.ref h3 { font-size: var(--t-md); text-transform: uppercase; }
+.ref p { margin-top: var(--sp-3); font-size: var(--t-sm); color: var(--ink-2); }
+.ref__stack { margin-top: auto; padding-top: var(--sp-5); }
+
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.chips li { margin-top: 0; }
+
+.chip {
   display: inline-block;
-  padding: .22rem .6rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface-inset);
-  font-family: var(--font-mono);
-  font-size: .7rem;
-  letter-spacing: .02em;
-  color: var(--text-muted);
+  padding: .2rem .55rem;
+  background: var(--tint);
+  /* The tint fill alone is 1.20:1 on a white card and 1.10:1 on a --paper-2
+     panel, so on a panel the pill shape all but disappears. The hairline is
+     what makes it read as a chip on any ground. */
+  border: 1px solid var(--accent-light);
+  color: var(--indigo);
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .3rem .75rem;
-  border-radius: var(--r-full);
-  background: var(--brand-gradient-soft);
-  border: 1px solid var(--border);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--text-muted);
-}
+/* ---------------------------------------------------------------- 12. lists */
 
-.filter-empty {
-  padding: var(--sp-8);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--r-lg);
-  text-align: center;
-  color: var(--text-muted);
-}
-
-/* --------------------------------------------------------------------------
-   12. Technology matrix
-   -------------------------------------------------------------------------- */
-
-.tech-grid {
+.split {
   display: grid;
-  gap: 1px;
-  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--border);
+  gap: clamp(2rem, 1rem + 4vw, 4rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 64rem) {
+  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .split--rail { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); align-items: start; }
+  /* A short intro beside a tall card: top-aligned it leaves the column looking
+     abandoned, so the text sits against the middle of the card instead. */
+  .split--middle > :first-child { align-self: center; }
+  /* Weighted towards the card: a fact sheet is nine label/value pairs, and at
+     an even split its value column was 317px, so most rows wrapped to two or
+     three lines and the card ran 884px against 275px of intro. Giving the card
+     the wider share lets the values sit on one line and takes the height out. */
+  .split--factsheet { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
+}
+
+.panel {
+  position: relative;
+  padding: clamp(1.4rem, 1rem + 1.6vw, 2.25rem);
+  /* A shallow diagonal instead of one flat grey, and the 4px edge moved to
+     ::before so it can carry the brand gradient — the same treatment the step
+     cards got, otherwise the panels read as inert boxes beside them. */
+  background: linear-gradient(158deg, var(--paper-2) 0%, #eef1f9 100%);
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 4px;
+  background: var(--grad);
+}
+
+/* A PAIR of panels takes successive windows on the sweep, so the two edges
+   read as one run rather than two identical bars. Guarded by the same quantity
+   query as the step cards: in a .split--rail the first child is the form or the
+   prose, not a panel, so the lone rail panel fails :first-child and keeps the
+   whole sweep instead of showing only its indigo tail. */
+.split > .panel:first-child:nth-last-child(2)::before,
+.split > .panel:first-child:nth-last-child(2) ~ .panel::before { background-size: 200% 100%; }
+.split > .panel:first-child:nth-last-child(2) ~ .panel::before { background-position: 100% 0; }
+
+.band--paper2 .panel { background: linear-gradient(158deg, var(--paper) 0%, #f7f8fc 100%); }
+.band--dark .panel {
+  background: linear-gradient(158deg, rgba(255, 255, 255, .1) 0%, rgba(255, 255, 255, .03) 100%);
+}
+.panel .eyebrow { margin-bottom: var(--sp-4); }
+
+/* ------------------------------------------------------------- 13b. tcard */
+/* Eight small cards rather than two large panels: one technology group each,
+   a plate head carrying the title and the chip list beneath. .post already
+   pairs a plate with a body, so this is that arrangement with the title moved
+   onto the plate and centred. */
+.tgrid {
+  display: grid;
+  gap: var(--sp-4);
+  /* Eight is a known, fixed count. Declared rather than auto-fit, for the same
+     reason as .steps: auto-fit cannot guarantee the split. 4+4, 2x4, then 8. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 68rem) { .tgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 34rem) { .tgrid { grid-template-columns: 1fr; } }
+
+.tcard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
   overflow: hidden;
 }
 
-.tech {
-  padding: var(--sp-6);
-  background: var(--surface);
-  transition: background-color .25s var(--ease);
-}
-
-.tech:hover { background: var(--surface-2); }
-
-.tech h3 {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  font-size: var(--fs-base);
-}
-
-.tech h3 svg { width: 1.15rem; height: 1.15rem; color: var(--accent); flex: none; }
-
-.tech p {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-.tech .tags { margin-top: var(--sp-4); }
-
-/* --------------------------------------------------------------------------
-   13. Blog
-   -------------------------------------------------------------------------- */
-
-.post-grid {
+.tcard__head {
+  position: relative;
   display: grid;
-  gap: var(--sp-5);
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  padding: var(--sp-4);
+  text-align: center;
+  /* Each head is a window one eighth further along the brand sweep, so the row
+     runs red to indigo across the eight cards — the same device as the step
+     card edges. */
+  background: var(--grad);
+  background-size: 800% 100%;
+}
+
+.tcard:nth-child(1) .tcard__head { background-position: 0% 0; }
+.tcard:nth-child(2) .tcard__head { background-position: 14.3% 0; }
+.tcard:nth-child(3) .tcard__head { background-position: 28.6% 0; }
+.tcard:nth-child(4) .tcard__head { background-position: 42.9% 0; }
+.tcard:nth-child(5) .tcard__head { background-position: 57.1% 0; }
+.tcard:nth-child(6) .tcard__head { background-position: 71.4% 0; }
+.tcard:nth-child(7) .tcard__head { background-position: 85.7% 0; }
+.tcard:nth-child(8) .tcard__head { background-position: 100% 0; }
+
+/* Texture in CSS rather than a plate image. The generated plates are drawn for
+   large surfaces: dropped into a 300x170 head, object-fit: cover magnifies a
+   fragment into flat colour, and stretching the whole plate in brings visible
+   edge banding. Eight image requests for nothing either way. A fine dot field
+   echoes the matrix plate, costs no request, and cannot fail to load.
+   The flat tint underneath is the scrim that keeps the title off the red end. */
+.tcard__head::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(14, 19, 56, .3);
+  background-image: radial-gradient(rgba(255, 255, 255, .17) 1px, transparent 1.4px);
+  background-size: 13px 13px;
+}
+
+.tcard__head h3 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #fff;
+  font-size: var(--t-md);
+  text-transform: uppercase;
+}
+
+.tcard__body {
+  flex: 1;
+  padding: var(--sp-5);
+  background: linear-gradient(158deg, var(--paper-2) 0%, #eef1f9 100%);
+}
+
+/* Not every group is a list of names — the in-house library is a sentence. */
+.tcard__note { margin: 0; font-size: var(--t-sm); color: var(--ink-2); }
+
+.facts { margin: 0; }
+
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: var(--sp-2) var(--sp-5);
+  padding-block: var(--sp-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.facts > div:first-child { border-top: 1px solid var(--rule); }
+
+/* Inside a panel the table is a card, not a page-width block: the label track
+   drops to v1's 9rem, the rows tighten, and the first and last shed the padding
+   that pushed the card away from its own edges. */
+.panel .facts > div {
+  grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+  padding-block: var(--sp-3);
+}
+
+.panel .facts > div:first-child { padding-top: 0; border-top: 0; }
+.panel .facts > div:last-child { padding-bottom: 0; border-bottom: 0; }
+
+.facts dt {
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: .2rem;
+}
+
+.facts dd { margin: 0; }
+
+.band--dark .facts > div { border-color: rgba(255, 255, 255, .18); }
+.band--dark .facts dt { color: var(--on-dark-2); }
+
+@media (max-width: 36rem) {
+  .facts > div { grid-template-columns: 1fr; }
+}
+
+/* The rail column is 22rem, so a .facts table inside it has ~278px of content:
+   the 12rem label track plus the 24px gap left 62px for the value, and the
+   address wrapped one word per line. The viewport media query above cannot
+   catch this — the viewport is wide, the container is not. Scoped to the same
+   breakpoint that creates the rail: below it the panel is full width and the
+   two-column form is fine again. */
+@media (min-width: 64rem) {
+  .split--rail .facts > div { grid-template-columns: 1fr; }
+  .split--rail .facts dt { padding-top: 0; }
+}
+
+.prose { max-width: 68ch; }
+.prose > * + * { margin-top: var(--sp-4); }
+.prose h2 { margin-top: var(--sp-8); font-size: var(--t-xl); text-transform: uppercase; }
+.prose h3 { margin-top: var(--sp-6); font-size: var(--t-md); text-transform: uppercase; }
+.prose p, .prose ul, .prose ol { color: var(--ink-2); }
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: .18em; }
+.prose hr { height: 1px; border: 0; background: var(--rule); margin-block: var(--sp-6); }
+
+.prose code {
+  padding: .1em .35em;
+  background: var(--tint);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: .9em;
+}
+
+.rich { max-width: 66ch; font-size: var(--t-md); }
+.rich > * + * { margin-top: var(--sp-5); }
+.rich h2 { margin-top: var(--sp-8); font-size: var(--t-xl); text-transform: uppercase; }
+.rich h3 { margin-top: var(--sp-6); font-size: var(--t-md); text-transform: uppercase; }
+.rich p, .rich ul, .rich ol { color: var(--ink-2); }
+.rich > p:first-of-type { color: var(--ink); font-weight: 500; }
+.rich li + li { margin-top: var(--sp-2); }
+.rich a { color: var(--accent); text-decoration: underline; text-underline-offset: .18em; }
+.rich blockquote { padding-left: var(--sp-5); border-left: 4px solid var(--accent); color: var(--ink-2); }
+.rich hr { height: 1px; border: 0; background: var(--rule); }
+
+/* ---------------------------------------------------------------- 13. posts */
+
+.posts {
+  display: grid;
+  gap: var(--sp-4);
   grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
 }
 
 .post {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease),
-              border-color .3s var(--ease);
-}
-
-.post:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Generated cover — no stock photography needed */
-.post__cover {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 9;
-  background: var(--brand-gradient);
+  background: var(--paper);
+  border-top: 4px solid var(--accent);
   overflow: hidden;
 }
 
-.post__cover::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, .13) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, .13) 1px, transparent 1px);
-  background-size: 2rem 2rem;
-  mask-image: radial-gradient(circle at 30% 25%, #000, transparent 78%);
-}
-
-.post__cover svg {
-  position: relative;
-  width: 2.6rem;
-  height: 2.6rem;
-  color: rgba(255, 255, 255, .92);
-}
-
-.post--alt .post__cover { background: linear-gradient(135deg, #2f3f9e, #0f1a52); }
-.post--alt2 .post__cover { background: linear-gradient(135deg, #8e2f8c, #dc2f2a); }
-
-.post__body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: var(--sp-5) var(--sp-6) var(--sp-6);
-}
-
-.post__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .45rem .85rem;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.post__body h3 { margin-top: var(--sp-3); font-size: var(--fs-lg); }
-
-.post__body h3 a {
-  color: inherit;
-  text-decoration: none;
-}
-
+.post__plate { aspect-ratio: 16 / 7; }
+.post__plate img { width: 100%; height: 100%; object-fit: cover; }
+.post__body { display: flex; flex-direction: column; flex: 1; padding: var(--sp-6); }
+.post__body h3 { margin-top: var(--sp-3); font-size: var(--t-md); text-transform: uppercase; }
+.post__body h3 a { text-decoration: none; }
 .post__body h3 a:hover { color: var(--accent); }
+.post__body p { margin-top: var(--sp-3); font-size: var(--t-sm); color: var(--ink-2); }
+.post__body .more { margin-top: auto; padding-top: var(--sp-5); }
 
-.post__body p {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-.post__body .link-arrow { margin-top: auto; padding-top: var(--sp-5); }
-
-/* Article layout */
-.article-head { max-width: 46rem; }
-.article-head h1 { font-size: var(--fs-3xl); }
-
-.article-body {
-  max-width: 44rem;
-  font-size: var(--fs-lg);
-}
-
-.article-body > * + * { margin-top: var(--sp-5); }
-.article-body h2 { margin-top: var(--sp-8); font-size: var(--fs-2xl); }
-.article-body h3 { margin-top: var(--sp-6); font-size: var(--fs-xl); }
-.article-body ul, .article-body ol { color: var(--text-muted); }
-.article-body li + li { margin-top: var(--sp-3); }
-.article-body p { color: var(--text-muted); }
-.article-body > p:first-of-type { color: var(--text); font-weight: 450; }
-
-/* --------------------------------------------------------------------------
-   14. Contact & forms
-   -------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------- 14. forms */
 
 .field { display: grid; gap: .4rem; }
 
 .field label {
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-}
-
-.field .hint {
-  font-size: var(--fs-xs);
-  color: var(--text-faint);
-  font-weight: 400;
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-2);
 }
 
 .field input,
-.field textarea,
-.field select {
+.field select,
+.field textarea {
   width: 100%;
-  padding: .75rem .9rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--text);
-  font-size: var(--fs-base);
-  transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
+  padding: .8rem .9rem;
+  border: 2px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--t-base);
+  transition: border-color .18s var(--ease);
 }
 
 .field textarea { min-height: 8.5rem; resize: vertical; }
-
-.field input::placeholder,
-.field textarea::placeholder { color: var(--text-faint); }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-3); }
 
 .field input:focus-visible,
-.field textarea:focus-visible,
-.field select:focus-visible {
+.field select:focus-visible,
+.field textarea:focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--indigo);
 }
+
+.field .hint {
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.field .err { font-size: var(--t-xs); color: var(--danger); font-weight: 600; }
+.field:not([data-invalid]) .err { display: none; }
 
 .field[data-invalid] input,
-.field[data-invalid] textarea {
-  border-color: var(--red);
-}
+.field[data-invalid] select,
+.field[data-invalid] textarea { border-color: var(--danger); }
 
-.field .error {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  color: var(--red);
-}
-
-.field:not([data-invalid]) .error { display: none; }
-
+/* One field per row. The same auto-fit rule in v1 happens to resolve to a
+   single column because v1's form column is only 424px; here it is 863px, so
+   auto-fit produced three across. Declared, so it does not depend on how wide
+   the column happens to be. */
 .form-grid {
   display: grid;
   gap: var(--sp-4);
-  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  grid-template-columns: 1fr;
+  max-width: 36rem;
 }
 
-.form-grid .field--full { grid-column: 1 / -1; }
+.form-grid .full { grid-column: 1 / -1; }
 
-.consent {
-  display: flex;
-  gap: .65rem;
-  align-items: flex-start;
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
+.consent { display: flex; gap: .65rem; align-items: flex-start; font-size: var(--t-sm); color: var(--ink-2); }
+.consent input { width: 1.05rem; height: 1.05rem; margin-top: .35rem; flex: none; accent-color: var(--accent); }
+.consent a { color: var(--accent); }
 
-.consent input {
-  width: 1.05rem;
-  height: 1.05rem;
-  margin-top: .3rem;
-  flex: none;
-  accent-color: var(--indigo);
-}
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-/* Honeypot — hidden from humans, tempting to bots */
-.hp {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
-.form-status {
+.status {
   padding: var(--sp-4);
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-inset);
-  font-size: var(--fs-sm);
+  border-left: 4px solid var(--rule);
+  background: var(--paper-2);
+  font-size: var(--t-sm);
 }
 
-.form-status:empty { display: none; }
-.form-status[data-state="ok"] { border-color: #2f9e5a; color: #1e7a42; background: rgba(47, 158, 90, .08); }
-.form-status[data-state="error"] { border-color: var(--red); color: var(--red-strong); background: var(--red-soft); }
+.status:empty { display: none; }
+.status[data-state="ok"] { border-color: #1f6b3f; color: #1a5c36; }
+.status[data-state="error"] { border-color: var(--danger); color: var(--danger); }
 
-:root[data-theme="dark"] .form-status[data-state="ok"] { color: #74d69b; }
-:root[data-theme="dark"] .form-status[data-state="error"] { color: #ff9d97; background: rgba(220, 47, 42, .12); }
+.map { overflow: hidden; background: var(--paper-2); aspect-ratio: 16 / 10; }
+.map iframe { display: block; width: 100%; height: 100%; border: 0; }
 
-/* Contact detail list */
-.contact-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--sp-5);
-}
+/* ------------------------------------------------------------------ 15. cta */
 
-.contact-list li {
-  display: flex;
-  gap: var(--sp-4);
-  margin-top: 0;
-}
-
-.contact-list svg {
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-top: .25rem;
-  flex: none;
-  color: var(--accent);
-}
-
-.contact-list dt,
-.contact-list .label {
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.contact-list .value {
-  margin-top: .2rem;
-  font-size: var(--fs-base);
-  font-style: normal;
-}
-
-.contact-list .value a { text-decoration: none; }
-.contact-list .value a:hover { text-decoration: underline; }
-
-.map-frame {
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface-inset);
-  aspect-ratio: 16 / 10;
-}
-
-.map-frame iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-/* --------------------------------------------------------------------------
-   15. CTA band
-   -------------------------------------------------------------------------- */
-
-.cta-band {
+.cta {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  background: var(--grad);
+  color: #fff;
+  padding-block: clamp(2.75rem, 2rem + 3vw, 4.5rem);
 }
 
-.cta-band::before {
-  content: "";
-  position: absolute;
-  inset: auto -10% -60% 20%;
-  z-index: -1;
-  width: min(44rem, 78vw);
-  aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(220, 47, 42, .3), transparent 60%),
-              radial-gradient(circle at 70% 40%, rgba(47, 63, 158, .38), transparent 64%);
-  filter: blur(26px);
-  pointer-events: none;
-}
-
-.cta-band__inner {
+.cta__inner {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1930,74 +1478,87 @@ button { cursor: pointer; }
   gap: var(--sp-6);
 }
 
-.cta-band h2 { max-width: 30ch; }
+.cta h2 { max-width: 26ch; font-size: var(--t-xl); text-transform: uppercase; }
+.cta p { margin-top: var(--sp-3); max-width: 48ch; color: #fff; }   /* rgba(.9) donnait 4,04:1 sur le rouge */
+/* The motif used to float at right:4%/top:18% over a band whose height varies
+   with its copy, while the buttons stay vertically centred — so whether the two
+   collided was luck: measured, it overlapped on offres, a-propos and blog, and
+   cleared index by 9px. Left as a plain flex item it stopped overlapping but
+   dropped onto its own line once the row ran out of width.
 
-.cta-band p {
-  margin-top: var(--sp-3);
-  max-width: 46ch;
-  color: var(--text-muted);
+   So the row reserves a strip for it and it is positioned into that strip: the
+   content box simply does not extend that far, which makes non-overlap a
+   property of the layout rather than of the copy's length. */
+@media (min-width: 60.01rem) {
+  .cta__inner { padding-right: calc(var(--gutter) + 5.75rem); }
+
+  .cta .squares {
+    right: var(--gutter);
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
-/* --------------------------------------------------------------------------
-   16. Footer
-   -------------------------------------------------------------------------- */
+/* The CTA ground is the brand gradient itself, so red on red and indigo on
+   indigo cancel out — every cell measured 1.02:1, at .5 opacity or at full.
+   No brand colour can work here. The header already answers this: on the
+   coloured topbar .brand__mark drops to a white fill plus a white outline, so
+   the motif keeps the mark's geometry and gives up its palette. Same here —
+   solid where the red triangle covers, outlined where the indigo one does. */
+.cta .squares span { background: rgba(255, 255, 255, .45); }
+.cta .squares span:nth-child(1) { background: #fff; }
 
-.site-footer { padding-block: var(--sp-9) var(--sp-6); }
+/* Same split in monochrome: solid where the red triangle covers, faint where
+   the indigo one does — one mapping, used everywhere in the motif.
 
-.site-footer__top {
+   The bottom-right cell was an outline, echoing .brand__mark, which drops the
+   indigo triangle to a stroke on the coloured topbar. That held while it was
+   the only indigo in the motif. Once the diagonal cells were split and started
+   rendering indigo as a faint fill, the same region of the mark was being drawn
+   two different ways in one figure, and the outlined cell read as an empty box
+   rather than as part of the shape. It takes the faint fill like the rest. */
+.cta .squares span:nth-child(2),
+.cta .squares span:nth-child(3) {
+  background: linear-gradient(135deg,
+    #fff 0 calc(50% - .5px), rgba(255, 255, 255, .3) calc(50% + .5px) 100%);
+}
+.cta .squares span:nth-child(4) { background: rgba(255, 255, 255, .3); }
+
+@media (max-width: 60rem) { .cta .squares { display: none; } }
+
+/* --------------------------------------------------------------- 16. footer */
+
+.site-footer {
+  background: var(--ground-2);
+  color: var(--on-dark-2);
+  padding-block: var(--sp-9) var(--sp-5);
+}
+
+.site-footer__grid {
   display: grid;
   gap: var(--sp-7);
   grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
 }
 
-.site-footer__brand { max-width: 22rem; }
-
-.site-footer__brand p {
-  margin-top: var(--sp-4);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-
-.footer-col h2 {
+.fcol h2 {
   margin-bottom: var(--sp-4);
-  font-size: var(--fs-xs);
+  font-family: var(--f-display);
+  font-size: var(--t-mi);
   font-weight: 700;
-  letter-spacing: .12em;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: #fff;
 }
 
-.footer-col ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: .55rem;
-  font-size: var(--fs-sm);
-}
+.fcol ul { margin: 0; padding: 0; list-style: none; display: grid; gap: .55rem; font-size: var(--t-sm); }
+.fcol li { margin-top: 0; }
+.fcol a { color: var(--on-dark-2); text-decoration: none; }
+.fcol a:hover { color: #fff; text-decoration: underline; }
+.fcol p { font-size: var(--t-sm); }
+.fcol address { font-style: normal; font-size: var(--t-sm); line-height: 1.8; }
+.fcol address a { color: var(--on-dark-2); }
 
-.footer-col li { margin-top: 0; }
-
-.footer-col a {
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.footer-col a:hover {
-  color: var(--text);
-  text-decoration: underline;
-}
-
-.footer-col address {
-  font-style: normal;
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-  line-height: 1.75;
-}
-
-.footer-col address a { color: var(--text-muted); }
-
-.site-footer__bottom {
+.site-footer__foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2005,165 +1566,127 @@ button { cursor: pointer; }
   gap: var(--sp-4);
   margin-top: var(--sp-8);
   padding-top: var(--sp-5);
-  border-top: 1px solid var(--border);
-  font-size: var(--fs-xs);
-  color: var(--text-faint);
+  border-top: 1px solid rgba(255, 255, 255, .16);
+  font-size: var(--t-xs);
 }
 
-.site-footer__bottom nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-4);
-}
+.site-footer__foot nav { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.site-footer__foot a { color: var(--on-dark-2); text-decoration: none; }
+.site-footer__foot a:hover { color: #fff; }
 
-.site-footer__bottom a { color: var(--text-faint); text-decoration: none; }
-.site-footer__bottom a:hover { color: var(--text); text-decoration: underline; }
+/* ------------------------------------------------- 16b. card outlines (fix)
 
-.social {
-  display: flex;
-  gap: var(--sp-2);
-  margin-top: var(--sp-5);
-  padding: 0;
-  list-style: none;
-}
-
-.social li { margin-top: 0; }
-
-.social a {
-  display: grid;
-  place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-full);
-  color: var(--text-muted);
-  transition: color .2s var(--ease), border-color .2s var(--ease),
-              background-color .2s var(--ease), transform .2s var(--ease);
-}
-
-.social a:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-  transform: translateY(-2px);
-}
-
-.social svg { width: 1.05rem; height: 1.05rem; }
-
-/* --------------------------------------------------------------------------
-   17. Utilities
+   .ref, .post, .steps > li and .panel are white-backed cards that appear on
+   white, grey AND dark bands. Relying on the parent for contrast meant that on
+   a plain white band the body vanished and only the 4px accent edge showed —
+   reading as a detached coloured bar rather than a card. A 1px outline in
+   addition to the accent edge makes them read correctly on every ground.
    -------------------------------------------------------------------------- */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
+.ref,
+.post,
+.steps > li,
+.panel {
+  border: 1px solid var(--rule);
 }
 
-.text-center { text-align: center; }
+/* Re-assert the accent edge after the shorthand above. */
+.post { border-top: 4px solid var(--accent); }
+/* .steps > li and .panel paint their edge with ::before (brand gradient) and
+   keep only the 1px outline from the shared rule above. */
 
-/* Full margin-top scale, mirroring the spacing tokens. Defined exhaustively so
-   a class used in markup can never silently resolve to nothing. */
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: var(--sp-1); }
-.mt-2 { margin-top: var(--sp-2); }
+.band--dark :is(.ref, .post, .steps > li, .panel) {
+  border-color: rgba(255, 255, 255, .16);
+}
+
+.band--dark .post { border-top-color: var(--accent-light); }
+
+/* ----------------------------------------------------------------- 17. util */
+
+.pillnav { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.pillnav li { margin-top: 0; }
+
+.pillnav a {
+  display: inline-block;
+  padding: .45rem .95rem;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color .18s var(--ease);
+}
+
+.pillnav a:hover { background: var(--accent); }
+
 .mt-3 { margin-top: var(--sp-3); }
 .mt-4 { margin-top: var(--sp-4); }
 .mt-5 { margin-top: var(--sp-5); }
 .mt-6 { margin-top: var(--sp-6); }
 .mt-7 { margin-top: var(--sp-7); }
 .mt-8 { margin-top: var(--sp-8); }
-.muted { color: var(--text-muted); }
-.faint { color: var(--text-faint); }
-.small { font-size: var(--fs-sm); }
-.mono { font-family: var(--font-mono); }
 
-.rule-gradient {
-  height: 2px;
-  border: 0;
-  border-radius: 2px;
-  background: var(--brand-gradient);
-  opacity: .85;
-}
+/* ------------------------------------------------- 17b. gradient emphasis
 
-.panel {
-  padding: clamp(1.5rem, 1rem + 2.5vw, 2.75rem);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  background: var(--surface);
-}
+   Emphasised headline words carry the brand gradient instead of a flat red.
+   Flat brand red was the last large red surface left on a light band, and a
+   gradient reads as brand rather than as alarm — the same reasoning that moved
+   the solid tile and the CTA hover.
 
-.panel { --timeline-halo: var(--surface); }
-.panel--inset {
-  background: var(--surface-inset);
-  --timeline-halo: var(--surface-inset);
-}
+   Applied ONLY to large type. A gradient across ten characters of 11px
+   uppercase reads as muddy noise, not as a gradient, so the small labels
+   (.eyebrow, .tile__label, .steps__n) keep their flat light red. Error text
+   keeps flat --danger, which is the entire point of that role.
 
-.media-frame {
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow);
-}
+   The flat colour declarations above remain the base: `color: transparent` with
+   an unsupported background-clip would make the words disappear entirely, which
+   is the same "relying on something else to supply the result" failure that hit
+   the cards, the plate tiles and the translucent labels.
 
-.media-frame img { width: 100%; }
-
-/* --------------------------------------------------------------------------
-   18. Motion
+   Contrast, measured per stop rather than guessed — an auditor only sees
+   `transparent` here:
+     light grounds  red 4.68:1 · purple 7.15:1 · indigo 9.03:1
+     dark grounds   7.21:1 · 7.73:1 · 7.43:1
    -------------------------------------------------------------------------- */
 
-/* Scoped to .js so that if JavaScript fails to load, every .reveal block stays
-   visible instead of being permanently stuck at opacity 0. The class is set by
-   the inline snippet in <head>. */
-.js .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
-  transition-delay: var(--reveal-delay, 0ms);
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .shead h2 .em {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .band--dark .shead h2 .em,
+  .hero h1 .em {
+    background: var(--grad-light);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
-.js .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
+/* --------------------------------------------------------------- 18. motion */
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
-
-  .js .reveal {
-    opacity: 1;
-    transform: none;
-  }
+  .hero__plate { animation: none !important; transform: none !important; }
 }
 
-/* --------------------------------------------------------------------------
-   19. Print
-   -------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------- 19. print */
 
 @media print {
-  .site-header,
-  .site-footer,
-  .cta-band,
-  .theme-toggle,
-  .nav-toggle,
-  .filter { display: none !important; }
-
+  .topbar, .site-footer, .cta, .icon-btn, .nav-toggle, .map, .squares { display: none !important; }
   body { background: #fff; color: #000; }
-
-  .js .reveal { opacity: 1; transform: none; }
-
-  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; }
+  .hero, .phero, .tile--dark, .tile--grad, .tile--plate { background: #fff !important; color: #000 !important; }
+  .hero__plate, .phero__plate, .tile__plate { display: none !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; }
 }

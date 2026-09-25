@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Audit non-text contrast of interactive surfaces (WCAG 2.1 SC 1.4.11).
 
-    python tools/audit-hover.py                 # v1
-    python tools/audit-hover.py --root v3 --theme light
+    python tools/audit-hover.py
+    python tools/audit-hover.py --theme dark
 
 audit-contrast.py checks TEXT against its background. It cannot see this class
 of defect: a filled control whose surface has too little contrast against the

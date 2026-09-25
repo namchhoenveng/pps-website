@@ -3,11 +3,10 @@
 
 The published output is ordinary static HTML — no runtime, no bundler, nothing
 to install on the server. This script exists only so the header, footer and nav
-live in ONE place per version instead of being copy-pasted into every page.
+live in ONE place instead of being copy-pasted into every page.
 
-    python tools/build.py                              # v1  -> project root
-    python tools/build.py --src _src-v2 --out v2 \
-                          --noindex                    # v2  -> v2/
+    python tools/build.py                               # the site
+    python tools/build.py --out _preview --noindex      # a preview build
 
 Each page in <src>/pages/ starts with a metadata comment:
 
@@ -88,7 +87,7 @@ def parse_page(text: str) -> tuple[dict[str, str], str, str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--src", default="_src", help="source tree (default: _src)")
+    ap.add_argument("--src", default="_src-v3", help="source tree (default: _src-v3)")
     ap.add_argument("--out", default=".", help="output directory (default: project root)")
     ap.add_argument("--site", default=DEFAULT_SITE, help="canonical site origin")
     ap.add_argument("--noindex", action="store_true",

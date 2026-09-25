@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Audit text/background contrast on every built page, in the real browser.
 
-    python tools/audit-contrast.py                 # v1
-    python tools/audit-contrast.py --root v2
-    python tools/audit-contrast.py --root v3 --theme dark
+    python tools/audit-contrast.py
+    python tools/audit-contrast.py --theme dark
 
 Why the browser and not the stylesheet: the effective background of a piece of
 text is whatever the nearest painted ancestor happens to be, after alpha
