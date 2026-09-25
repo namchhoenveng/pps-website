@@ -1,0 +1,5 @@
+# Normalise line endings in the repo; checkouts stay native.
+* text=auto
+*.png binary
+*.jpg binary
+*.ico binary

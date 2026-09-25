@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr" prefix="og: https://ogp.me/ns#">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<link rel="canonical" href="{{SITE}}{{PATH}}">{{ROBOTS}}
+
+<meta property="og:type" content="{{OGTYPE}}">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Paris Partners Softwares">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:url" content="{{SITE}}{{PATH}}">
+<meta property="og:image" content="{{SITE}}assets/img/plates/plate-hero.svg">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="760">
+<meta property="og:image:alt" content="Paris Partners Softwares — ingénierie logicielle depuis 2004">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/img/brand/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="assets/img/brand/favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+{{HEAD_EXTRA}}
+</head>
+
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<!-- ==================================================================== TOPBAR
+     Generated from _src-v3/layout.html — edit there, then run:
+       python tools/build.py --src _src-v3 --out v3 --noindex
+     ========================================================================= -->
+<header class="topbar">
+  <div class="shell topbar__inner">
+
+    <a class="brand" href="index.html" aria-label="Paris Partners Softwares — accueil">
+      <svg class="brand__mark" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+        <path d="M3 3h34L3 37Z" fill="#fff"/>
+        <path d="M41 7v34H7Z" fill="none" stroke="#fff" stroke-width="3" stroke-opacity=".7"/>
+      </svg>
+      <span>
+        <span class="brand__name">PPS</span>
+        <span class="brand__tag">Paris Partners Softwares</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Navigation principale">
+      <ul class="nav__list">
+{{NAV}}
+      </ul>
+      <a class="btn btn--on-dark" href="contact.html">Prendre rendez-vous</a>
+    </nav>
+
+    <div class="bar-tools">
+      <a class="btn btn--on-dark" href="contact.html">Prendre rendez-vous</a>
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
+        <span class="bars"></span>
+        <span class="sr-only">Ouvrir le menu</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<main id="main">
+{{BODY}}
+</main>
+
+<!-- ==================================================================== FOOTER -->
+<footer class="site-footer">
+  <div class="shell">
+
+    <div class="site-footer__grid">
+
+      <div class="fcol">
+        <h2>Paris Partners Softwares</h2>
+        <p>
+          Ingénierie logicielle depuis 2004. Conception, tierce maintenance
+          applicative et tests pour des applications qui ne peuvent pas
+          s’arrêter.
+        </p>
+        <p class="mt-4">
+          <a href="https://www.linkedin.com/company/paris-partners-softwares" target="_blank" rel="noopener">LinkedIn</a>
+        </p>
+      </div>
+
+      <nav class="fcol" aria-labelledby="f-nav">
+        <h2 id="f-nav">Navigation</h2>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="offres.html">Offres</a></li>
+          <li><a href="cas-clients.html">Cas clients</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <nav class="fcol" aria-labelledby="f-off">
+        <h2 id="f-off">Offres</h2>
+        <ul>
+          <li><a href="offres.html#sur-mesure">Développement sur mesure</a></li>
+          <li><a href="offres.html#tma">Maintenance applicative</a></li>
+          <li><a href="offres.html#qualite">Tests &amp; qualité</a></li>
+          <li><a href="offres.html#mobile">Mobile, e-commerce &amp; ERP</a></li>
+          <li><a href="offres.html#data">Data &amp; IA</a></li>
+        </ul>
+      </nav>
+
+      <div class="fcol">
+        <h2>Contact</h2>
+        <address>
+          56 boulevard de la Mission Marchande<br>
+          92400 Courbevoie, France<br>
+          <a href="tel:+33156370000">01 56 37 00 00</a><br>
+          <a href="mailto:contact@parispartners.com">contact@parispartners.com</a>
+        </address>
+      </div>
+
+    </div>
+
+    <div class="site-footer__foot">
+      <p>&copy; <span data-year>2026</span> Paris Partners Softwares — SIREN 452 925 118</p>
+      <nav aria-label="Liens légaux">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="mentions-legales.html#donnees">Données personnelles</a>
+        <a href="mentions-legales.html#cookies">Cookies</a>
+        <a href="plan-du-site.html">Plan du site</a>
+      </nav>
+    </div>
+
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>

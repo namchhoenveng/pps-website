@@ -1,0 +1,16 @@
+# Editor
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Scratch files written by tools/ while auditing, removed on success but left
+# behind if a run is interrupted.
+_audit-*.html
+_audit_tmp/
+_hover-*.html
+_probe.html
+_iso.html
+_naked.html

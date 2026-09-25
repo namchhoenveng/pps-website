@@ -1,0 +1,1269 @@
+/* ==========================================================================
+   Paris Partners Softwares — v2, "engineering register"
+   ---------------------------------------------------------------------------
+   A deliberately different design language from v1. The thesis: PPS sells
+   twenty-two years of software that does not fall over, so the site should
+   read like an engineering deliverable rather than a marketing brochure.
+
+   Consequences, all intentional:
+     - monochrome paper-and-ink with ONE accent. No gradients, and no colour
+       system pretending to carry information it does not carry.
+     - hairline rules instead of drop shadows; 3px radii instead of 20px.
+     - monospace for every label, index and figure. Type carries the technical
+       signal, so no icon set is needed at all.
+     - content as lists and tables, not card grids.
+     - essentially no motion. Nothing fades in and nothing waits for
+       JavaScript, so there is no invisible-content failure mode.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- 1. tokens */
+
+:root {
+  --f-display: "Inter Tight", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale: tighter tracking and shorter leading than v1, for the
+     large-and-dense editorial look. */
+  --t-mono: .75rem;
+  --t-xs: .8125rem;
+  --t-sm: .875rem;
+  --t-base: clamp(1rem, .985rem + .08vw, 1.0625rem);
+  --t-md: clamp(1.0625rem, 1.03rem + .16vw, 1.1875rem);
+  --t-lg: clamp(1.2rem, 1.13rem + .32vw, 1.4rem);
+  --t-xl: clamp(1.5rem, 1.36rem + .62vw, 1.95rem);
+  --t-2xl: clamp(1.9rem, 1.55rem + 1.6vw, 2.9rem);
+  --t-3xl: clamp(2.5rem, 1.75rem + 3.4vw, 4.6rem);
+
+  --sp-1: .25rem;
+  --sp-2: .5rem;
+  --sp-3: .75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 2.75rem;
+  --sp-8: 3.5rem;
+  --sp-9: 5rem;
+
+  --gutter: clamp(1.15rem, .5rem + 3vw, 3rem);
+  --maxw: 1280px;
+  --measure: 64ch;
+  --idx-col: 3.25rem;
+
+  --r: 3px;
+  --r-2: 6px;
+
+  --head-h: 3.75rem;
+  --ease: cubic-bezier(.3, .7, .4, 1);
+}
+
+/* Light is the default: this is a document, and documents are paper. */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  /* Neutral scale with a barely-there cool cast (hue 240, very low saturation).
+     The first pass used a warm 45deg greyscale, which read as letterpress
+     stationery rather than a technical document. */
+  --paper: #f9f9fb;
+  --surface: #ffffff;
+  --surface-2: #f1f1f5;
+  --ink: #101014;
+  --ink-2: #52525b;
+  --ink-3: #6c6c76;
+  --rule: #e3e3e8;
+  --rule-2: #c3c3cb;
+  /* The logo red is #dc2f2a but that is only 4.45:1 on this paper. This is the
+     same hue (1.7deg) darkened to clear AA for small text; the untouched brand
+     red is kept in --brand-red for the mark, which is a graphic, not text. */
+  --accent: #d12a25;
+  --brand-red: #dc2f2a;
+  --accent-ink: #ffffff;
+  --accent-soft: #fdeceb;
+  --logo-tile: #ffffff;
+  --ok: #1f6b3f;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0a0a0c;
+  --surface: #121215;
+  --surface-2: #18181c;
+  --ink: #ececef;
+  --ink-2: #a1a1aa;
+  --ink-3: #8b8b95;
+  --rule: #26262b;
+  --rule-2: #3a3a42;
+  /* Lifted to 5.5:1 on near-black while staying within 1.3deg of brand hue. */
+  --accent: #f4483f;
+  --brand-red: #f4483f;
+  --accent-ink: #14100e;
+  --accent-soft: #2a1211;
+  --logo-tile: #ececef;
+  --ok: #6fce97;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --paper: #0a0a0c;
+    --surface: #121215;
+    --surface-2: #18181c;
+    --ink: #ececef;
+    --ink-2: #a1a1aa;
+    --ink-3: #8b8b95;
+    --rule: #26262b;
+    --rule-2: #3a3a42;
+    /* Lifted to 5.5:1 on near-black while staying within 1.3deg of brand hue. */
+    --accent: #f4483f;
+    --brand-red: #f4483f;
+    --accent-ink: #14100e;
+    --accent-soft: #2a1211;
+    --logo-tile: #ececef;
+    --ok: #6fce97;
+  }
+}
+
+/* ---------------------------------------------------------- 2. reset & base */
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--head-h) + 2rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--t-base);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis-weight: none;
+  overflow-x: hidden;
+}
+
+body.is-locked { overflow: hidden; }
+
+img, svg { display: block; max-width: 100%; height: auto; }
+
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -.028em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--t-3xl); letter-spacing: -.038em; }
+h2 { font-size: var(--t-2xl); letter-spacing: -.032em; }
+h3 { font-size: var(--t-lg); line-height: 1.2; }
+h4 { font-size: var(--t-md); line-height: 1.3; }
+
+p { text-wrap: pretty; }
+
+a { color: inherit; }
+
+ul, ol { padding-left: 1.1rem; }
+li + li { margin-top: .3em; }
+
+strong { font-weight: 600; color: var(--ink); }
+
+abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: .18em;
+  cursor: help;
+}
+
+table { border-collapse: collapse; width: 100%; }
+
+:where(button, input, select, textarea) { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* Focus uses ink, not the accent: the accent is also the form-error colour, and
+   a red ring around a focused button reads as "you did something wrong". Ink is
+   18:1 on paper and 17:1 on the dark ground, so it loses nothing in visibility. */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: var(--r);
+}
+
+:focus:not(:focus-visible) { outline: none; }
+
+/* ------------------------------------------------------------ 3. primitives */
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.band { padding-block: clamp(3.25rem, 2rem + 5vw, 6rem); }
+.band--tight { padding-block: clamp(2.25rem, 1.5rem + 3vw, 3.75rem); }
+.band--edge { border-top: 1px solid var(--rule); }
+.band--fill { background: var(--surface-2); }
+
+.mono {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-feature-settings: "tnum" 1;
+}
+
+.deck {
+  max-width: var(--measure);
+  font-size: var(--t-md);
+  color: var(--ink-2);
+}
+
+.note { font-size: var(--t-sm); color: var(--ink-3); }
+.measure { max-width: var(--measure); }
+
+.stack > * + * { margin-top: var(--sp-4); }
+.stack-lg > * + * { margin-top: var(--sp-6); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: .5rem;
+  left: 50%;
+  z-index: 200;
+  padding: .6rem 1.1rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  text-decoration: none;
+  transform: translate(-50%, -220%);
+  transition: transform .2s var(--ease);
+}
+
+.skip-link:focus-visible { transform: translate(-50%, 0); }
+
+/* Section header: monospace index in a narrow left column, title on the right.
+   This is the load-bearing device of the design. It frames every section as a
+   numbered clause in a specification, which is the whole idea. */
+.shead {
+  display: grid;
+  grid-template-columns: var(--idx-col) minmax(0, 1fr);
+  gap: var(--sp-3) var(--sp-5);
+  align-items: start;
+  padding-top: var(--sp-4);
+  border-top: 2px solid var(--ink);
+  margin-bottom: var(--sp-7);
+}
+
+.shead__idx {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--accent);
+  padding-top: .35rem;
+}
+
+.shead__body { max-width: 46rem; }
+.shead__body .deck { margin-top: var(--sp-4); }
+
+@media (max-width: 34rem) {
+  .shead { grid-template-columns: 1fr; }
+  .shead__idx { padding-top: 0; }
+}
+
+/* -------------------------------------------------------------- 4. controls */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .72rem 1.25rem;
+  border: 1px solid var(--ink);
+  border-radius: var(--r);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--f-display);
+  font-size: var(--t-sm);
+  font-weight: 550;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .16s var(--ease), color .16s var(--ease),
+              border-color .16s var(--ease);
+}
+
+.btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* No fill, so the border is what identifies the control (SC 1.4.11).
+   --rule-2 gave 1.55:1; --ink-3 gives 4.94:1 light / 5.86:1 dark. */
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.btn--ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.btn--sm { padding: .5rem .9rem; font-size: var(--t-xs); }
+.btn svg { width: 1em; height: 1em; flex: none; }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+
+/* Text link. The underline is part of the resting state, not a hover reveal. */
+.tlink {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-family: var(--f-display);
+  font-size: var(--t-sm);
+  font-weight: 550;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule-2);
+  padding-bottom: 1px;
+  transition: color .16s var(--ease), border-color .16s var(--ease);
+}
+
+.tlink:hover { color: var(--accent); border-color: var(--accent); }
+.tlink svg { width: .95em; height: .95em; flex: none; }
+
+.prose a,
+.rich a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+
+.prose a:hover,
+.rich a:hover { color: var(--accent); }
+
+/* ---------------------------------------------------------------- 5. header */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .site-header {
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px) saturate(140%);
+  }
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  min-height: var(--head-h);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin-right: auto;
+  color: var(--ink);
+  text-decoration: none;
+  flex: none;
+}
+
+.brand__mark { width: 1.6rem; height: 1.6rem; flex: none; }
+
+.brand__name {
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -.02em;
+}
+
+.brand__sep { color: var(--rule-2); }
+
+.brand__tag {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (max-width: 40rem) {
+  .brand__sep,
+  .brand__tag { display: none; }
+}
+
+.nav { display: flex; align-items: center; gap: var(--sp-4); }
+
+/* The in-drawer CTA duplicates the one in .head-tools; each viewport shows
+   exactly one of the two. */
+.nav > .btn { display: none; }
+
+.nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__list li + li { margin-top: 0; }
+
+.nav__link {
+  position: relative;
+  display: block;
+  padding: .35rem 0;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  font-weight: 450;
+  text-decoration: none;
+  transition: color .16s var(--ease);
+}
+
+.nav__link:hover { color: var(--ink); }
+.nav__link[aria-current="page"] { color: var(--ink); font-weight: 550; }
+
+.nav__link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.head-tools { display: flex; align-items: center; gap: var(--sp-2); flex: none; }
+
+/* Icon-only control. The icon itself carries identification at 7.35:1, so a
+   3:1 border is not strictly required here; --rule-2 is a craft improvement on
+   --rule (1.22:1) without weighing down a deliberately delicate design. */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--ink-2);
+  transition: color .16s var(--ease), border-color .16s var(--ease);
+}
+
+.icon-btn:hover { color: var(--ink); border-color: var(--rule-2); }
+.icon-btn svg { width: 1rem; height: 1rem; }
+
+.icon-moon { display: none; }
+:root[data-theme="dark"] .icon-sun { display: none; }
+:root[data-theme="dark"] .icon-moon { display: block; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .icon-sun { display: none; }
+  :root:not([data-theme]) .icon-moon { display: block; }
+}
+
+.nav-toggle { display: none; }
+
+.nav-toggle .bars {
+  position: relative;
+  width: 1rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.nav-toggle .bars::before,
+.nav-toggle .bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transition: transform .22s var(--ease);
+}
+
+.nav-toggle .bars::before { top: -5px; }
+.nav-toggle .bars::after { top: 5px; }
+
+.nav-toggle[aria-expanded="true"] .bars { background: transparent; }
+.nav-toggle[aria-expanded="true"] .bars::before { transform: translateY(5px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .bars::after { transform: translateY(-5px) rotate(-45deg); }
+
+@media (max-width: 61rem) {
+  .nav-toggle { display: grid; }
+
+  .nav {
+    position: fixed;
+    inset: var(--head-h) 0 0;
+    z-index: 99;
+    display: block;
+    padding: var(--sp-5) var(--gutter) var(--sp-8);
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .2s var(--ease), visibility .2s;
+  }
+
+  .nav.is-open { visibility: visible; opacity: 1; }
+
+  .nav__list { flex-direction: column; align-items: stretch; gap: 0; }
+
+  .nav__link {
+    padding: .95rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--t-md);
+  }
+
+  .nav__link[aria-current="page"]::after {
+    left: 0;
+    right: auto;
+    width: 1.5rem;
+    bottom: -1px;
+  }
+
+  .nav > .btn {
+    display: inline-flex;
+    margin-top: var(--sp-5);
+    width: 100%;
+    justify-content: center;
+  }
+  .head-tools .btn { display: none; }
+}
+
+/* ------------------------------------------------------------------ 6. hero */
+
+.hero { padding-block: clamp(3rem, 2rem + 6vw, 7rem) 0; }
+
+.hero__kicker { margin-bottom: var(--sp-5); }
+.hero h1 { max-width: 22ch; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+
+.hero__deck {
+  margin-top: var(--sp-6);
+  max-width: 56ch;
+  font-size: var(--t-lg);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.hero .actions { margin-top: var(--sp-7); }
+
+/* Spec strip: the hero's factual footing. Four data cells divided by
+   hairlines, in monospace. The figures are deliberately static — they are
+   facts, and animating a count-up would make them look like a stunt. */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+  margin-top: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+  border-top: 1px solid var(--rule);
+}
+
+.specs > div {
+  padding: var(--sp-5) var(--sp-4) var(--sp-5) 0;
+  border-right: 1px solid var(--rule);
+}
+
+.specs > div:last-child { border-right: 0; }
+.specs > div + div { padding-left: var(--sp-5); }
+
+.specs dt {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.specs dd {
+  margin: .5rem 0 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.35rem);
+  font-weight: 600;
+  letter-spacing: -.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.specs dd small {
+  display: block;
+  margin-top: .3rem;
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+@media (max-width: 46rem) {
+  .specs { grid-template-columns: repeat(2, 1fr); }
+  .specs > div { border-bottom: 1px solid var(--rule); }
+  .specs > div:nth-child(2n) { border-right: 0; padding-left: var(--sp-5); }
+  .specs > div:nth-child(2n+1) { padding-left: 0; }
+}
+
+/* Compact hero for inner pages. */
+.phero {
+  padding-block: clamp(2.5rem, 1.75rem + 3.5vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+
+.phero__kicker { margin-bottom: var(--sp-4); }
+.phero h1 { font-size: var(--t-2xl); max-width: 26ch; }
+.phero .deck { margin-top: var(--sp-5); }
+
+/* -------------------------------------------------------- 7. list-based rows */
+
+/* The core content pattern: full-width rows split by hairlines, replacing the
+   card grid. Denser, more scannable, and a long description can breathe
+   instead of being clipped to a card's fixed height. */
+.rows { border-top: 1px solid var(--rule); }
+
+.row {
+  display: grid;
+  grid-template-columns: var(--idx-col) minmax(0, 20rem) minmax(0, 1fr);
+  gap: var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-6);
+  border-bottom: 1px solid var(--rule);
+  transition: background-color .18s var(--ease);
+}
+
+.row:hover { background: var(--surface-2); }
+
+.row__idx {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--accent);
+  padding-top: .3rem;
+}
+
+.row__head h3 { text-wrap: balance; }
+.row__head .mono { display: block; margin-top: var(--sp-3); }
+.row__head .tlink { margin-top: var(--sp-4); }
+
+.row__body { color: var(--ink-2); }
+.row__body > * + * { margin-top: var(--sp-4); }
+
+.row__body ul {
+  padding-left: 0;
+  list-style: none;
+  font-size: var(--t-sm);
+}
+
+.row__body ul li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.row__body ul li::before {
+  content: "\2014";
+  position: absolute;
+  left: 0;
+  color: var(--rule-2);
+}
+
+@media (max-width: 60rem) {
+  .row { grid-template-columns: var(--idx-col) minmax(0, 1fr); }
+  .row__body { grid-column: 2; }
+}
+
+@media (max-width: 34rem) {
+  .row { grid-template-columns: 1fr; }
+  .row__body { grid-column: 1; }
+  .row__idx { padding-top: 0; }
+}
+
+/* ------------------------------------------------------------- 8. procedure */
+
+.proc {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.proc > li {
+  display: grid;
+  grid-template-columns: var(--idx-col) minmax(0, 1fr);
+  gap: var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-5);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 0;
+}
+
+.proc__n {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--accent);
+  padding-top: .25rem;
+}
+
+.proc h3 { font-size: var(--t-md); }
+.proc p { margin-top: var(--sp-2); color: var(--ink-2); max-width: 68ch; }
+
+@media (max-width: 34rem) {
+  .proc > li { grid-template-columns: 1fr; }
+  .proc__n { padding-top: 0; }
+}
+
+/* ---------------------------------------------------------------- 9. tables */
+
+.tbl-wrap {
+  overflow-x: auto;
+  /* A data table is the one component where horizontal scroll is the correct
+     answer rather than a way of hiding content from the reader. */
+  border-top: 1px solid var(--ink);
+}
+
+.tbl { font-size: var(--t-sm); min-width: 48rem; }
+
+/* Tables scroll sideways on narrow screens. Say so, rather than leaving the
+   reader to discover it by accident. */
+.scroll-hint { display: none; }
+
+@media (max-width: 52rem) {
+  .scroll-hint {
+    display: block;
+    margin-bottom: var(--sp-3);
+    font-family: var(--f-mono);
+    font-size: var(--t-mono);
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+}
+
+.tbl caption {
+  text-align: left;
+  padding-bottom: var(--sp-4);
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+
+.tbl th,
+.tbl td {
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tbl thead th {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--rule-2);
+}
+
+.tbl tbody tr { transition: background-color .16s var(--ease); }
+.tbl tbody tr:hover { background: var(--surface-2); }
+
+.tbl__client {
+  font-family: var(--f-display);
+  font-size: var(--t-md);
+  font-weight: 600;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.tbl__logo { width: 7rem; padding-right: var(--sp-4); }
+
+.tbl__logo img {
+  width: 100%;
+  max-height: 2.4rem;
+  object-fit: contain;
+  object-position: left center;
+  filter: grayscale(1);
+  opacity: .85;
+  transition: filter .16s var(--ease), opacity .16s var(--ease);
+}
+
+.tbl tbody tr:hover .tbl__logo img { filter: none; opacity: 1; }
+
+.tbl__stack {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.tbl__dom { color: var(--ink-3); white-space: nowrap; }
+
+/* ------------------------------------------------------------ 10. key/value */
+
+.kv { margin: 0; border-top: 1px solid var(--rule); }
+
+.kv > div {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: var(--sp-3) var(--sp-5);
+  padding-block: var(--sp-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.kv dt {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: .15rem;
+}
+
+.kv dd { margin: 0; color: var(--ink); }
+
+@media (max-width: 34rem) {
+  .kv > div { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------- 11. two-up */
+
+.split {
+  display: grid;
+  gap: clamp(2rem, 1rem + 4vw, 4rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 62rem) {
+  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .split--rail { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); align-items: start; }
+  .split--sticky > :last-child { position: sticky; top: calc(var(--head-h) + 2rem); }
+}
+
+.panel {
+  padding: clamp(1.35rem, 1rem + 1.6vw, 2rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-2);
+  background: var(--surface);
+}
+
+.panel--flat { background: transparent; }
+
+/* ----------------------------------------------------------------- 12. tags */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li { margin-top: 0; }
+
+.tag {
+  display: inline-block;
+  padding: .18rem .5rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- 13. prose */
+
+.prose { max-width: 68ch; }
+.prose > * + * { margin-top: var(--sp-4); }
+.prose h2 { margin-top: var(--sp-8); font-size: var(--t-xl); }
+.prose h3 { margin-top: var(--sp-6); font-size: var(--t-md); }
+.prose p, .prose ul, .prose ol { color: var(--ink-2); }
+
+.prose code {
+  font-family: var(--f-mono);
+  font-size: .9em;
+  padding: .1em .35em;
+  background: var(--surface-2);
+  border-radius: var(--r);
+}
+
+.prose hr { height: 1px; border: 0; background: var(--rule); margin-block: var(--sp-6); }
+
+.rich { max-width: 66ch; font-size: var(--t-md); }
+.rich > * + * { margin-top: var(--sp-5); }
+.rich h2 { margin-top: var(--sp-8); font-size: var(--t-xl); }
+.rich h3 { margin-top: var(--sp-6); font-size: var(--t-md); }
+.rich p, .rich ul, .rich ol { color: var(--ink-2); }
+.rich > p:first-of-type { color: var(--ink); }
+.rich li + li { margin-top: var(--sp-2); }
+
+.rich blockquote {
+  padding-left: var(--sp-5);
+  border-left: 2px solid var(--accent);
+  color: var(--ink-2);
+}
+
+.rich hr { height: 1px; border: 0; background: var(--rule); }
+
+/* ---------------------------------------------------------------- 14. posts */
+
+.posts { border-top: 1px solid var(--rule); }
+
+.post {
+  display: grid;
+  grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) auto;
+  gap: var(--sp-4) var(--sp-5);
+  align-items: baseline;
+  padding-block: var(--sp-5);
+  border-bottom: 1px solid var(--rule);
+  transition: background-color .16s var(--ease);
+}
+
+.post:hover { background: var(--surface-2); }
+
+.post__meta {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.post__title { font-size: var(--t-md); }
+.post__title a { text-decoration: none; }
+.post__title a:hover { color: var(--accent); }
+
+.post__deck {
+  margin-top: var(--sp-2);
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  max-width: 62ch;
+}
+
+.post__len {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+@media (max-width: 48rem) {
+  .post { grid-template-columns: 1fr; }
+  .post__len { display: none; }
+}
+
+/* ---------------------------------------------------------------- 15. forms */
+
+.field { display: grid; gap: .35rem; }
+
+.field label {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: .7rem .8rem;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--t-base);
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
+}
+
+.field textarea { min-height: 8rem; resize: vertical; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--ink-3); }
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--rule);
+}
+
+.field .hint {
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.field .err { font-size: var(--t-xs); color: var(--accent); }
+.field:not([data-invalid]) .err { display: none; }
+
+.field[data-invalid] input,
+.field[data-invalid] select,
+.field[data-invalid] textarea { border-color: var(--accent); }
+
+.form-grid {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+}
+
+.form-grid .full { grid-column: 1 / -1; }
+
+.consent {
+  display: flex;
+  gap: .6rem;
+  align-items: flex-start;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+
+.consent input {
+  width: 1rem;
+  height: 1rem;
+  margin-top: .3rem;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.status {
+  padding: var(--sp-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-size: var(--t-sm);
+}
+
+.status:empty { display: none; }
+
+.status[data-state="ok"] {
+  border-color: var(--ok);
+  color: var(--ok);
+  background: transparent;
+}
+
+.status[data-state="error"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.map {
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-2);
+  background: var(--surface-2);
+  aspect-ratio: 16 / 10;
+}
+
+.map iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+/* ------------------------------------------------------------------ 16. cta */
+
+.cta {
+  border-top: 2px solid var(--ink);
+  padding-block: clamp(2.75rem, 2rem + 3vw, 4.5rem);
+}
+
+.cta__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.cta h2 { max-width: 24ch; font-size: var(--t-xl); }
+.cta p { margin-top: var(--sp-3); max-width: 46ch; color: var(--ink-2); }
+
+/* --------------------------------------------------------------- 17. footer */
+
+.site-footer {
+  border-top: 1px solid var(--rule);
+  background: var(--surface-2);
+  padding-block: var(--sp-8) var(--sp-5);
+}
+
+.site-footer__grid {
+  display: grid;
+  gap: var(--sp-7);
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+}
+
+.fcol h2 {
+  margin-bottom: var(--sp-4);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fcol ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: .5rem;
+  font-size: var(--t-sm);
+}
+
+.fcol li { margin-top: 0; }
+.fcol a { color: var(--ink-2); text-decoration: none; }
+
+.fcol a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
+
+.fcol address {
+  font-style: normal;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+
+.fcol address a { color: var(--ink-2); }
+
+.fcol p { font-size: var(--t-sm); color: var(--ink-2); }
+
+.site-footer__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--rule);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.site-footer__foot nav { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.site-footer__foot a { color: var(--ink-3); text-decoration: none; }
+.site-footer__foot a:hover { color: var(--ink); }
+
+/* ----------------------------------------------------------------- 18. misc */
+
+.logo-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-5) var(--sp-7);
+}
+
+.logo-strip img {
+  width: auto;
+  max-width: 6.5rem;
+  max-height: 1.75rem;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: .6;
+  transition: filter .16s var(--ease), opacity .16s var(--ease);
+}
+
+.logo-strip img:hover { filter: none; opacity: 1; }
+
+.pillnav { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.pillnav li { margin-top: 0; }
+
+.pillnav a {
+  display: inline-block;
+  padding: .4rem .85rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  text-decoration: none;
+  transition: color .16s var(--ease), border-color .16s var(--ease);
+}
+
+.pillnav a:hover { color: var(--ink); border-color: var(--ink); }
+
+.mt-3 { margin-top: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-5 { margin-top: var(--sp-5); }
+.mt-6 { margin-top: var(--sp-6); }
+.mt-7 { margin-top: var(--sp-7); }
+.mt-8 { margin-top: var(--sp-8); }
+
+/* --------------------------------------------------------------- 19. motion */
+
+/* There is almost nothing to disable here — no entrance animation exists by
+   design. This covers hover transitions and smooth scrolling only. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------- 20. print */
+
+@media print {
+  .site-header,
+  .site-footer,
+  .cta,
+  .icon-btn,
+  .nav-toggle,
+  .map { display: none !important; }
+
+  body { background: #fff; color: #000; }
+
+  .row:hover,
+  .post:hover,
+  .tbl tbody tr:hover { background: transparent; }
+
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; }
+}

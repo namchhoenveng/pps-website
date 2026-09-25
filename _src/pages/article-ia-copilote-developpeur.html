@@ -1,0 +1,163 @@
+<!--meta
+title: Assistants de code en entreprise : ce qui change vraiment | PPS
+description: Retour d'expérience sur l'usage des assistants de code IA dans des bases de code métier : ce qu'ils accélèrent, ce qu'ils ne remplacent pas, et le cadre à poser avant de les déployer.
+nav: blog
+path: article-ia-copilote-developpeur.html
+ogtype: article
+-->
+
+<!--head-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Assistants de code en entreprise : ce qui change vraiment pour vos équipes",
+  "description": "Retour d'expérience sur l'usage des assistants de code IA dans des bases de code métier.",
+  "author": { "@type": "Organization", "name": "Paris Partners Softwares" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Paris Partners Softwares",
+    "url": "https://parispartners.com/"
+  },
+  "mainEntityOfPage": "https://parispartners.com/article-ia-copilote-developpeur.html",
+  "inLanguage": "fr-FR"
+}
+</script>
+<!--/head-->
+
+  <!-- ============================================================ PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">
+        <a href="blog.html" style="color:inherit">Blog</a> · Ingénierie
+      </p>
+      <div class="article-head">
+        <h1>Assistants de code en entreprise : ce qui change vraiment pour vos équipes</h1>
+        <p class="post__meta mt-5">
+          <span>Ingénierie</span><span>Lecture 6 min</span><span>Par l’équipe PPS</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== ARTICLE -->
+  <article class="section">
+    <div class="container">
+      <div class="article-body">
+
+        <p>
+          La question ne nous est plus posée sous la forme « faut-il y aller ? » mais « comment
+          l’encadrer ? ». En deux ans, les assistants de code sont passés du gadget de démonstration à
+          l’outil que la moitié de nos développeurs ouvre chaque matin. Voici ce que nous en retenons
+          après les avoir utilisés sur de vraies bases de code métier — celles qui ont dix ou quinze ans,
+          des conventions maison et une recette contractuelle à la fin.
+        </p>
+
+        <h2>Ce qu’ils accélèrent réellement</h2>
+
+        <p>
+          Le gain est net, mais il n’est pas là où les démonstrations le placent. Écrire une fonction
+          inédite à partir d’une page blanche n’est pas le goulot d’étranglement d’un projet métier. Ce
+          qui coûte du temps, c’est tout ce qui l’entoure — et c’est précisément là que l’outil aide :
+        </p>
+
+        <ul>
+          <li>La <strong>compréhension d’un code inconnu</strong> lors d’une reprise ou d’un audit : faire expliquer un traitement de 800 lignes est plus rapide que le lire.</li>
+          <li>Le <strong>code répétitif mais non trivial</strong> : couches d’accès aux données, mapping d’objets, sérialisation, conversion de formats.</li>
+          <li>L’<strong>écriture des tests</strong>, en particulier les cas limites qu’un développeur pressé aurait laissés de côté.</li>
+          <li>La <strong>migration mécanique</strong> d’un framework ou d’une version de langage à une autre, quand la transformation est régulière.</li>
+          <li>La <strong>documentation</strong>, cette tâche que personne ne fait spontanément et dont l’absence coûte cher trois ans plus tard.</li>
+        </ul>
+
+        <h2>Ce qu’ils ne remplacent pas</h2>
+
+        <p>
+          Un assistant produit du code plausible. Sur un périmètre métier, « plausible » et « correct »
+          sont deux choses différentes, et l’écart se paye en production.
+        </p>
+
+        <h3>La connaissance du métier</h3>
+        <p>
+          Aucun modèle ne sait que dans votre entreprise, une commande annulée après facturation suit un
+          circuit comptable particulier, ou que ce champ apparemment libre est en réalité contraint par
+          une obligation réglementaire. Ces règles ne sont pas dans le code : elles sont dans la tête de
+          trois personnes. Les faire émerger reste un travail d’analyse, mené avec vos équipes.
+        </p>
+
+        <h3>L’architecture</h3>
+        <p>
+          Un assistant optimise localement. Il produira volontiers cinq implémentations légèrement
+          différentes du même besoin dans cinq fichiers, chacune défendable isolément. Décider où se situe
+          une responsabilité, ce qui doit être partagé et ce qui doit rester séparé, reste une décision
+          humaine — et c’est celle dont on hérite pendant dix ans.
+        </p>
+
+        <h3>La revue de code</h3>
+        <p>
+          C’est le point sur lequel nous sommes les plus fermes. Le code assisté augmente le volume produit
+          par développeur, donc le volume à relire. Une équipe qui accélère la production sans renforcer la
+          revue ne gagne pas du temps : elle en emprunte, avec intérêts.
+        </p>
+
+        <h2>Le cadre que nous posons avant de déployer</h2>
+
+        <p>
+          Nous n’interdisons pas ces outils et nous ne les imposons pas. Nous exigeons en revanche quatre
+          garde-fous, que nous recommandons à nos clients d’appliquer chez eux.
+        </p>
+
+        <ol>
+          <li>
+            <strong>Confidentialité d’abord.</strong> Le code d’un client ne quitte pas le périmètre
+            autorisé par son contrat. Cela se vérifie dans les conditions du fournisseur, pas dans un
+            billet de blog — y compris celui-ci.
+          </li>
+          <li>
+            <strong>Aucun code non relu en production.</strong> La provenance ne change rien à la règle.
+            Elle la rend plus nécessaire.
+          </li>
+          <li>
+            <strong>Les tests restent écrits en connaissance du besoin.</strong> Faire générer un test à
+            partir du code que l’on veut valider produit un test qui confirme le bug.
+          </li>
+          <li>
+            <strong>Traçabilité des dépendances.</strong> Un assistant suggère volontiers une bibliothèque
+            tierce. L’ajout d’une dépendance reste une décision d’architecture, avec ses implications de
+            licence et de maintenance.
+          </li>
+        </ol>
+
+        <h2>Ce que nous en concluons</h2>
+
+        <p>
+          Les assistants de code sont un gain de productivité réel et mesurable sur une partie du travail
+          d’un développeur. Ils ne réduisent pas le besoin d’ingénierie — ils le déplacent vers l’amont
+          (comprendre le besoin, décider de l’architecture) et vers l’aval (relire, tester, mettre en
+          production sereinement).
+        </p>
+
+        <p>
+          Autrement dit : ils rendent les bonnes équipes plus rapides et les équipes mal encadrées plus
+          rapidement endettées. C’est une raison de plus de s’intéresser à la méthode avant de
+          s’intéresser à l’outil.
+        </p>
+
+        <hr>
+
+        <p class="small faint">
+          Cet article reflète notre pratique interne à la date de publication. Le sujet évolue vite : si
+          vous vous posez la question pour vos propres équipes, parlons-en directement plutôt que de vous
+          fier à un texte de l’an dernier.
+        </p>
+
+      </div>
+
+      <div class="btn-row mt-8">
+        <a class="btn btn--ghost" href="blog.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Tous les articles
+        </a>
+        <a class="btn btn--primary" href="contact.html">En discuter avec nous</a>
+      </div>
+    </div>
+  </article>
